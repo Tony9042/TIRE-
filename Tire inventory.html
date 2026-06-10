@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>統玉輪胎 · 庫存管理系統</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --black: #0e0e0e;
+    --dark: #1a1a1a;
+    --panel: #242424;
+    --border: #333333;
+    --border-light: #3d3d3d;
+    --text-primary: #f0ede8;
+    --text-secondary: #9e9a94;
+    --text-muted: #5e5a55;
+    --accent: #e8a020;
+    --accent-dim: #a86e12;
+    --accent-bg: rgba(232, 160, 32, 0.08);
+    --accent-bg-hover: rgba(232, 160, 32, 0.14);
+    --green: #4caf7a;
+    --green-bg: rgba(76, 175, 122, 0.1);
+    --red: #e05050;
+    --red-bg: rgba(224, 80, 80, 0.1);
+    --yellow: #e8c040;
+    --yellow-bg: rgba(232, 192, 64, 0.1);
+    --blue: #4a9ede;
+    --blue-bg: rgba(74, 158, 222, 0.1);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    background: var(--black);
+    color: var(--text-primary);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Layout ── */
+  .app-shell { display: flex; height: 100vh; overflow: hidden; }
+
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--dark);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .brand {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    font-family: 'Inter', sans-serif;
+  }
+  .sidebar-logo .sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 20px 4px;
+    margin-top: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 400;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .nav-item:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+  .nav-item.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--accent-bg);
+    font-weight: 500;
+  }
+  .nav-item .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .sidebar-footer .stat-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text-muted); margin-bottom: 4px;
+  }
+  .sidebar-footer .stat-row span:last-child { color: var(--text-secondary); font-weight: 500; }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    background: var(--dark);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .topbar h1 { font-size: 17px; font-weight: 600; color: var(--text-primary); }
+  .topbar .subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+  /* ── Panels ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Cards ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+  .stat-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: var(--text-primary); font-family: 'Inter', sans-serif; line-height: 1; }
+  .stat-card .unit { font-size: 13px; color: var(--text-secondary); margin-left: 4px; font-weight: 400; }
+  .stat-card .note { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.blue::before { background: var(--blue); }
+
+  /* ── Search box ── */
+  .search-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .search-box h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+  .search-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 500; }
+
+  input[type="text"], select {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    padding: 9px 13px;
+    font-size: 13.5px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 200px;
+  }
+  input[type="text"]:focus, select:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: var(--text-muted); }
+  select option { background: var(--panel); }
+
+  .btn {
+    padding: 9px 18px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn-primary { background: var(--accent); color: var(--black); }
+  .btn-primary:hover { background: #f0b030; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--border-light); color: var(--text-primary); background: var(--panel); }
+  .btn-success { background: var(--green); color: var(--black); }
+  .btn-success:hover { background: #5fc98a; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ── Result card ── */
+  .result-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    display: none;
+  }
+  .result-card.show { display: block; }
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-spec { font-size: 22px; font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+  .result-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-ok { background: var(--green-bg); color: var(--green); }
+  .badge-low { background: var(--yellow-bg); color: var(--yellow); }
+  .badge-warn { background: var(--red-bg); color: var(--red); }
+
+  .result-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+  .meta-item .meta-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .meta-item .meta-value { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+
+  .location-list { display: flex; flex-direction: column; gap: 8px; }
+  .location-item {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .location-item .loc-info { display: flex; flex-direction: column; gap: 2px; }
+  .location-item .loc-name { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .location-item .loc-detail { font-size: 12px; color: var(--text-muted); }
+  .location-item .loc-count {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Table ── */
+  .table-wrapper {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .table-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .table-header h2 { font-size: 14px; font-weight: 600; }
+  .table-header .count { font-size: 12px; color: var(--text-muted); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--dark);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.025); }
+
+  .spec-mono { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--text-primary); font-weight: 500; }
+  .qty-num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; color: var(--accent); }
+
+  /* status pills */
+  .pill {
+    display: inline-block; padding: 3px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .pill-ok { background: var(--green-bg); color: var(--green); }
+  .pill-low { background: var(--yellow-bg); color: var(--yellow); }
+  .pill-warn { background: var(--red-bg); color: var(--red); }
+  .pill-zone { background: var(--accent-bg); color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Add inventory ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-full { grid-column: 1 / -1; }
+  .form-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .form-section h2 { font-size: 15px; font-weight: 600; margin-bottom: 20px; }
+
+  input[type="number"] {
+    background: var(--dark); border: 1px solid var(--border); border-radius: var(--radius);
+    color: var(--text-primary); padding: 9px 13px; font-size: 13.5px; font-family: inherit;
+    outline: none; transition: border-color 0.15s; width: 100%;
+  }
+  input[type="number"]:focus { border-color: var(--accent); }
+  .input-wide { width: 100%; }
+
+  /* ── Zone overview ── */
+  .zone-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+  .zone-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .zone-card:hover { border-color: var(--accent); background: var(--accent-bg); }
+  .zone-card.selected { border-color: var(--accent); background: var(--accent-bg); }
+  .zone-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .zone-type { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+  .zone-stats { display: flex; gap: 20px; }
+  .zone-stat .label { font-size: 11px; color: var(--text-muted); }
+  .zone-stat .value { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+
+  .zone-bar-wrap { margin-top: 12px; background: var(--dark); border-radius: 4px; height: 4px; overflow: hidden; }
+  .zone-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s; }
+
+  .zone-detail-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+    display: none;
+  }
+  .zone-detail-panel.show { display: block; }
+
+  /* ── Alert list ── */
+  .alert-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    transition: border-color 0.15s;
+  }
+  .alert-item:hover { border-color: var(--border-light); }
+  .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .alert-dot.low { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .alert-dot.warn { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+  .alert-info { flex: 1; }
+  .alert-spec { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 13px; color: var(--text-primary); }
+  .alert-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .alert-count { font-size: 20px; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px; z-index: 1000;
+    background: var(--panel); border: 1px solid var(--accent);
+    border-radius: var(--radius); padding: 14px 18px;
+    font-size: 13.5px; color: var(--text-primary);
+    display: none; align-items: center; gap: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: slideIn 0.2s ease;
+  }
+  .toast.show { display: flex; }
+  @keyframes slideIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* ── Filter bar ── */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-bar input { min-width: 220px; }
+  .filter-count { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+
+  /* ── scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+  /* ── misc ── */
+  .section-divider { height: 1px; background: var(--border); margin: 24px 0; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state .msg { font-size: 14px; }
+
+  .price-range { font-size: 12px; color: var(--text-secondary); }
+
+  /* Modal */
+  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-backdrop.show { display: flex; }
+  .modal { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; width: 500px; max-width: 95vw; }
+  .modal h2 { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .modal .form-group { margin-bottom: 16px; }
+  .modal input, .modal select { width: 100%; }
+
+  /* size distribution chart */
+  .chart-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .chart-row .bar-label { width: 80px; font-size: 12px; color: var(--text-secondary); text-align: right; font-family: 'JetBrains Mono', monospace; }
+  .chart-row .bar-track { flex: 1; background: var(--dark); border-radius: 4px; height: 20px; overflow: hidden; }
+  .chart-row .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; display: flex; align-items: center; padding-left: 8px; transition: width 0.5s; }
+  .chart-row .bar-fill-inner { font-size: 11px; font-weight: 600; color: var(--black); }
+  .chart-row .bar-val { width: 36px; text-align: right; font-size: 12px; color: var(--text-secondary); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">統玉輪胎</div>
+      <div class="sub">庫存管理系統</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section-label">主要功能</div>
+      <div class="nav-item active" onclick="goPage('overview')">
+        <span class="icon">📊</span> 總覽儀表板
+      </div>
+      <div class="nav-item" onclick="goPage('search')">
+        <span class="icon">🔍</span> 規格查詢
+      </div>
+      <div class="nav-item" onclick="goPage('add')">
+        <span class="icon">➕</span> 新增庫存
+      </div>
+
+      <div class="nav-section-label">庫存管理</div>
+      <div class="nav-item" onclick="goPage('zones')">
+        <span class="icon">🗂️</span> 倉位庫存
+      </div>
+      <div class="nav-item" onclick="goPage('all')">
+        <span class="icon">📋</span> 全部品項
+      </div>
+      <div class="nav-item" onclick="goPage('alerts')">
+        <span class="icon">⚠️</span> 低庫存警示
+        <span id="alertBadge" style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:700;"></span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="stat-row"><span>總輪胎數</span><span id="sb-total">—</span></div>
+      <div class="stat-row"><span>規格數</span><span id="sb-specs">—</span></div>
+      <div class="stat-row"><span>低庫存</span><span id="sb-low" style="color:var(--red)">—</span></div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="page-title">總覽儀表板</h1>
+        <div class="subtitle" id="page-sub">所有倉位庫存概況</div>
+      </div>
+      <div class="topbar-actions">
+        <span style="font-size:12px;color:var(--text-muted)">最後更新：2025/07</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ═══ OVERVIEW PAGE ═══ -->
+      <div class="page active" id="page-overview">
+
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="label">輪胎總庫存</div>
+            <div class="value">740<span class="unit">條</span></div>
+            <div class="note">全部倉位合計</div>
+          </div>
+          <div class="stat-card green">
+            <div class="label">規格種類</div>
+            <div class="value">84<span class="unit">種</span></div>
+            <div class="note">含轎車胎 / 貨車胎</div>
+          </div>
+          <div class="stat-card red">
+            <div class="label">低庫存警示</div>
+            <div class="value" id="ov-alert-count">—</div>
+            <div class="note">庫存 ≤ 4 條</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="label">需補貨規格</div>
+            <div class="value" id="ov-restock-count">—</div>
+            <div class="note">標記「需補貨」</div>
+          </div>
+        </div>
+
+        <!-- Zone summary -->
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h2>各倉位庫存摘要</h2>
+            <span class="count">8 個倉位</span>
+          </div>
+          <table id="zone-summary-table">
+            <thead>
+              <tr>
+                <th>倉位</th>
+                <th>分類</th>
+                <th>規格數</th>
+                <th>總條數</th>
+                <th>庫存分布</th>
+              </tr>
+            </thead>
+            <tbody id="zone-summary-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Size distribution -->
+        <div class="form-section">
+          <h2>各尺寸庫存分布</h2>
+          <div id="size-chart"></div>
+        </div>
+
+      </div>
+
+      <!-- ═══ SEARCH PAGE ═══ -->
+      <div class="page" id="page-search">
+        <div class="search-box">
+          <h2>🔍 輪胎規格查詢</h2>
+          <div class="search-row">
+            <div class="form-group">
+              <label>輸入規格</label>
+              <input type="text" id="search-input" placeholder="例：225/55R18、195/65R15" oninput="searchTire()">
+            </div>
+            <div class="form-group">
+              <label>篩選倉位</label>
+              <select id="search-zone" onchange="searchTire()">
+                <option value="">全部倉位</option>
+                <option>3A</option><option>3B</option><option>3C</option><option>3D</option>
+                <option>4A</option><option>4B</option><option>4C</option><option>4D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>狀態篩選</label>
+              <select id="search-status" onchange="searchTire()">
+                <option value="">全部</option>
+                <option>正常</option><option>低庫存</option><option>需補貨</option>
+              </select>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="clearSearch()">清除</button>
+          </div>
+        </div>
+
+        <!-- Single result detail -->
+        <div class="result-card" id="result-card">
+          <div class="result-header">
+            <div>
+              <div class="result-spec" id="res-spec"></div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px" id="res-inch"></div>
+            </div>
+            <span class="result-badge" id="res-badge"></span>
+          </div>
+          <div class="result-meta">
+            <div class="meta-item">
+              <div class="meta-label">總庫存</div>
+              <div class="meta-value" id="res-qty" style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:24px;"></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">建議倉位</div>
+              <div class="meta-value" id="res-zone"></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">型號</div>
+              <div class="meta-value" id="res-brand"></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">年份/DOT</div>
+              <div class="meta-value" id="res-dot"></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">報價範圍</div>
+              <div class="meta-value" id="res-price"></div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">產地</div>
+              <div class="meta-value" id="res-origin"></div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">位置明細</div>
+          <div class="location-list" id="res-locations"></div>
+        </div>
+
+        <!-- Search results list -->
+        <div class="table-wrapper" id="search-results-wrap">
+          <div class="table-header">
+            <h2>搜尋結果</h2>
+            <span class="count" id="search-result-count">輸入規格以查詢</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>規格</th>
+                <th>吋數</th>
+                <th>倉位</th>
+                <th>庫存</th>
+                <th>型號</th>
+                <th>DOT</th>
+                <th>報價</th>
+                <th>狀態</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="search-results-body">
+              <tr><td colspan="9"><div class="empty-state"><div class="icon">🔍</div><div class="msg">輸入規格關鍵字以開始查詢</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ADD INVENTORY PAGE ═══ -->
+      <div class="page" id="page-add">
+        <div class="form-section">
+          <h2>➕ 新增庫存</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>規格（必填）</label>
+              <input type="text" id="add-spec" placeholder="例：225/55R18" class="input-wide">
+            </div>
+            <div class="form-group">
+              <label>型號（必填）</label>
+              <input type="text" id="add-brand" placeholder="例：PS5、SA4、AG3" class="input-wide">
+            </div>
+            <div class="form-group">
+              <label>數量（必填）</label>
+              <input type="number" id="add-qty" placeholder="條數" min="1">
+            </div>
+            <div class="form-group">
+              <label>報價（NT$）</label>
+              <input type="number" id="add-price" placeholder="每條報價">
+            </div>
+            <div class="form-group">
+              <label>年份/DOT</label>
+              <input type="text" id="add-dot" placeholder="例：3724" class="input-wide">
+            </div>
+            <div class="form-group">
+              <label>產地</label>
+              <select id="add-origin" class="input-wide">
+                <option value="">未指定</option>
+                <option>大</option><option>泰</option><option>台</option><option>歐</option>
+                <option>義</option><option>法</option><option>日</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>樓層</label>
+              <select id="add-floor" class="input-wide">
+                <option>3樓</option><option>4樓</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>位置</label>
+              <input type="text" id="add-location" placeholder="例：3樓原左二排-右表" class="input-wide">
+            </div>
+            <div class="form-group">
+              <label>建議倉位</label>
+              <select id="add-zone" class="input-wide">
+                <option>3A</option><option>3B</option><option>3C</option><option>3D</option>
+                <option>4A</option><option>4B</option><option>4C</option><option>4D</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>是否貨車胎</label>
+              <select id="add-truck" class="input-wide">
+                <option value="否">否</option>
+                <option value="是">是</option>
+              </select>
+            </div>
+            <div class="form-group form-full">
+              <label>備註</label>
+              <input type="text" id="add-note" placeholder="其他備註（可空白）" class="input-wide">
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <button class="btn btn-primary" onclick="addInventory()">✅ 確認新增</button>
+            <button class="btn btn-ghost" onclick="clearAddForm()">清除</button>
+          </div>
+        </div>
+
+        <!-- Recently added -->
+        <div class="table-wrapper">
+          <div class="table-header">
+            <h2>本次新增記錄</h2>
+            <span class="count" id="added-count">0 筆</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>規格</th><th>型號</th><th>數量</th><th>DOT</th><th>報價</th><th>倉位</th><th>位置</th></tr>
+            </thead>
+            <tbody id="added-list">
+              <tr><td colspan="7"><div class="empty-state"><div class="icon">📦</div><div class="msg">尚未新增任何庫存</div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ZONES PAGE ═══ -->
+      <div class="page" id="page-zones">
+        <div class="zone-grid" id="zone-cards"></div>
+        <div class="zone-detail-panel" id="zone-detail">
+          <div class="table-header" style="padding:0 0 16px;border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <h2 id="zone-detail-title">倉位詳情</h2>
+            <button class="btn btn-ghost btn-sm" onclick="closeZoneDetail()">關閉</button>
+          </div>
+          <table>
+            <thead>
+              <tr><th>規格</th><th>型號</th><th>庫存</th><th>DOT</th><th>報價</th><th>狀態</th><th>位置明細</th></tr>
+            </thead>
+            <tbody id="zone-detail-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ALL PAGE ═══ -->
+      <div class="page" id="page-all">
+        <div class="filter-bar">
+          <input type="text" id="all-filter" placeholder="搜尋規格、型號…" oninput="filterAll()">
+          <select id="all-zone-filter" onchange="filterAll()">
+            <option value="">全部倉位</option>
+            <option>3A</option><option>3B</option><option>3C</option><option>3D</option>
+            <option>4A</option><option>4B</option><option>4C</option><option>4D</option>
+          </select>
+          <select id="all-status-filter" onchange="filterAll()">
+            <option value="">全部狀態</option>
+            <option>正常</option><option>低庫存</option><option>需補貨</option>
+          </select>
+          <span class="filter-count" id="all-count"></span>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>規格</th><th>吋數</th><th>倉位</th><th>庫存</th><th>型號</th><th>DOT</th><th>報價範圍</th><th>產地</th><th>狀態</th></tr>
+            </thead>
+            <tbody id="all-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ═══ ALERTS PAGE ═══ -->
+      <div class="page" id="page-alerts">
+        <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+          <div class="stat-card red">
+            <div class="label">低庫存（≤2條）</div>
+            <div class="value" id="al-critical">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">需補貨（≤4條）</div>
+            <div class="value" id="al-warn">—</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="label">低庫存警示門檻</div>
+            <div class="value">4<span class="unit">條</span></div>
+          </div>
+        </div>
+        <div id="alert-list"></div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app-shell -->
+
+<div class="toast" id="toast">
+  <span>✅</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const INVENTORY_KEY = 'tongyu_inventory_v2';
+
+const BASE_DATA = [
+  {spec:"155R13C",inch:"13吋",zone:"4C",qty:13,brand:"南港",dot:"0226 / 3425",priceMin:2000,priceMax:2000,origin:"台",status:"正常",loc:"4樓 4樓原走道/貨車區 → 4C：2條 / 4樓 4樓原左四排 → 4C：11條",truck:"是"},
+  {spec:"165R13C",inch:"13吋",zone:"4C",qty:26,brand:"AG3 / 米",dot:"2925",priceMin:2400,priceMax:2400,origin:"泰",status:"正常",loc:"4樓 4樓原走道/貨車區 → 4C：10條 / 4樓 4樓原走道/貨車區 → 4C：10條 / 4樓 4樓原走道/貨車區 → 4C：6條",truck:"是"},
+  {spec:"165R14",inch:"14吋",zone:"3A",qty:10,brand:"AG3",dot:"3125",priceMin:3200,priceMax:3200,origin:"",status:"正常",loc:"3樓 3樓原左一排-左表 → 3A：10條",truck:"否"},
+  {spec:"165R14C",inch:"14吋",zone:"4C",qty:4,brand:"南港 / 米",dot:"",priceMin:2600,priceMax:3200,origin:"泰",status:"需補貨",loc:"4樓 4樓原走道/貨車區 → 4C：2條 / 4樓 4樓原走道/貨車區 → 4C：2條",truck:"是"},
+  {spec:"175R14C",inch:"14吋",zone:"4C",qty:9,brand:"南港",dot:"",priceMin:2600,priceMax:2600,origin:"泰",status:"正常",loc:"4樓 4樓原走道/貨車區 → 4C：9條",truck:"是"},
+  {spec:"175/65R14",inch:"14吋",zone:"3A",qty:6,brand:"SA4",dot:"0926",priceMin:2600,priceMax:2600,origin:"泰",status:"正常",loc:"3樓 3樓原左一排-左表 → 3A：6條",truck:"否"},
+  {spec:"185R14C",inch:"14吋",zone:"4C",qty:21,brand:"AG3",dot:"4124",priceMin:3000,priceMax:3000,origin:"",status:"正常",loc:"4樓 4樓原左四排 → 4C：10條 / 4樓 4樓原左四排 → 4C：11條",truck:"是"},
+  {spec:"185/60R14",inch:"14吋",zone:"3A",qty:9,brand:"XM2",dot:"0926 / 2025",priceMin:2700,priceMax:2700,origin:"大",status:"正常",loc:"3樓 3樓原左一排-左表 → 3A：4條 / 3樓 3樓原左一排-左表 → 3A：5條",truck:"否"},
+  {spec:"185/65R14",inch:"14吋",zone:"3A",qty:4,brand:"SA4",dot:"5125",priceMin:2700,priceMax:2700,origin:"台",status:"需補貨",loc:"3樓 3樓原左一排-右表 → 3A：4條",truck:"否"},
+  {spec:"185/55R15",inch:"15吋",zone:"3A",qty:7,brand:"PS3",dot:"2124",priceMin:3000,priceMax:3000,origin:"",status:"正常",loc:"3樓 3樓原左一排-左表 → 3A：7條",truck:"否"},
+  {spec:"185/60R15",inch:"15吋",zone:"3A",qty:12,brand:"P4 / XM2",dot:"1924 / 4224",priceMin:2600,priceMax:3000,origin:"",status:"正常",loc:"3樓 3樓原左一排-右表 → 3A：8條 / 3樓 3樓原左一排-左表 → 3A：4條",truck:"否"},
+  {spec:"185/65R15",inch:"15吋",zone:"3A",qty:18,brand:"P4 / SA4",dot:"3125 / 4424 / 5125",priceMin:3000,priceMax:3300,origin:"台 / 大",status:"正常",loc:"3樓 3樓原左二排-左表 → 3A：6條 / 3樓 3樓原左一排-右表 → 3A：8條 / 3樓 3樓原左一排-左表 → 3A：4條",truck:"否"},
+  {spec:"195/50R15",inch:"15吋",zone:"3A",qty:2,brand:"P4+",dot:"0322*2",priceMin:2000,priceMax:2000,origin:"",status:"低庫存",loc:"3樓 3樓原左一排-右表 → 3A：2條",truck:"否"},
+  {spec:"195/55R15",inch:"15吋",zone:"3A",qty:4,brand:"SA4",dot:"4825",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",loc:"3樓 3樓原左一排-右表 → 3A：4條",truck:"否"},
+  {spec:"195/60R15",inch:"15吋",zone:"3A",qty:5,brand:"XM2",dot:"3225",priceMin:3000,priceMax:3000,origin:"大",status:"正常",loc:"3樓 3樓原左一排-右表 → 3A：5條",truck:"否"},
+  {spec:"195/65R15",inch:"15吋",zone:"3A",qty:31,brand:"P4 / SA4 / 南港",dot:"0326 / 0626 / 3825 / 4025",priceMin:2500,priceMax:3000,origin:"大 / 泰",status:"正常",loc:"3樓 3樓原左一排-左表 → 3A：8條 / 3樓 3樓原左一排-左表 → 3A：6條 / 3樓 3樓原左一排-右表 → 3A：9條 / 3樓 3樓原左一排-左表 → 3A：4條 / 3樓 3樓原左一排-右表 → 3A：4條",truck:"否"},
+  {spec:"195/70R15C",inch:"15吋",zone:"4C",qty:5,brand:"BS",dot:"",priceMin:3800,priceMax:3800,origin:"泰",status:"正常",loc:"4樓 4樓原走道/貨車區 → 4C：5條",truck:"是"},
+  {spec:"205/65R15",inch:"15吋",zone:"3A",qty:3,brand:"SA4",dot:"0826",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",loc:"3樓 3樓原左一排-右表 → 3A：3條",truck:"否"},
+  {spec:"205/65R15C",inch:"15吋",zone:"4C",qty:6,brand:"AG3",dot:"4823",priceMin:3800,priceMax:3800,origin:"泰",status:"正常",loc:"4樓 4樓原走道/貨車區 → 4C：6條",truck:"是"},
+  {spec:"205/70R15",inch:"15吋",zone:"3A",qty:9,brand:"SUV+ / 南港",dot:"0626 / 3525",priceMin:2900,priceMax:3800,origin:"大",status:"正常",loc:"3樓 3樓原左二排-左表 → 3A：5條 / 4樓 4樓原左四排 → 3A：4條",truck:"否"},
+  {spec:"225/70R15",inch:"15吋",zone:"3A",qty:2,brand:"吉星",dot:"",priceMin:0,priceMax:0,origin:"",status:"低庫存",loc:"4樓 4樓原左三排 → 3A：2條",truck:"否"},
+  {spec:"700R15C",inch:"15吋",zone:"4C",qty:4,brand:"正新",dot:"4725",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",loc:"4樓 4樓原左四排 → 4C：4條",truck:"是"},
+  {spec:"185/55R16",inch:"16吋",zone:"3B",qty:6,brand:"BS / SA4",dot:"0626 / 2525",priceMin:3200,priceMax:3800,origin:"泰",status:"正常",loc:"3樓 3樓原左一排-左表 → 3B：4條 / 3樓 3樓原左一排-左表 → 3B：2條",truck:"否"},
+  {spec:"195/50R16",inch:"16吋",zone:"3B",qty:2,brand:"BS",dot:"4225",priceMin:3200,priceMax:3200,origin:"大",status:"低庫存",loc:"3樓 3樓原左一排-右表 → 3B：2條",truck:"否"},
+  {spec:"195/55R16",inch:"16吋",zone:"3B",qty:14,brand:"BS / P4 / P5 / 防爆",dot:"1520 / 1525 / 3225 / 4422",priceMin:1000,priceMax:4000,origin:"大 / 泰",status:"正常",loc:"3樓 3樓原左一排-右表 → 3B：2條 / 3樓 3樓原左一排-右表 → 3B：4條 / 3樓 3樓原左一排-右表 → 3B：4條 / 4樓 4樓原左四排 → 3B：4條",truck:"否"},
+  {spec:"195/60R16",inch:"16吋",zone:"3B",qty:7,brand:"P4 / SA4",dot:"4325 / 4725",priceMin:3500,priceMax:4000,origin:"大",status:"正常",loc:"3樓 3樓原左一排-左表 → 3B：4條 / 3樓 3樓原左一排-左表 → 3B：3條",truck:"否"},
+  {spec:"195/75R16C",inch:"16吋",zone:"4D",qty:37,brand:"AG3 / BS",dot:"4325",priceMin:3800,priceMax:3800,origin:"",status:"正常",loc:"4樓 4樓原左一排-右表 → 4D：20條 / 4樓 4樓原走道/貨車區 → 4D：10條 / 4樓 4樓原左四排 → 4D：7條",truck:"是"},
+  {spec:"195/85R16C",inch:"16吋",zone:"4D",qty:2,brand:"米",dot:"1126",priceMin:6500,priceMax:6500,origin:"泰",status:"低庫存",loc:"4樓 4樓原左三排 → 4D：2條",truck:"是"},
+  {spec:"205/45R16",inch:"16吋",zone:"3B",qty:1,brand:"PS3",dot:"0522",priceMin:1500,priceMax:1500,origin:"",status:"低庫存",loc:"3樓 3樓原左一排-左表 → 3B：1條",truck:"否"},
+  {spec:"205/55R16",inch:"16吋",zone:"3B",qty:21,brand:"P5 / SA4",dot:"0226 / 4725",priceMin:3600,priceMax:4000,origin:"大",status:"正常",loc:"3樓 3樓原左二排-左表 → 3B：8條 / 3樓 3樓原左二排-右表 → 3B：13條",truck:"否"},
+  {spec:"205/60R16",inch:"16吋",zone:"3B",qty:9,brand:"P4 / XM2",dot:"4325 / 4525",priceMin:3600,priceMax:3800,origin:"大",status:"正常",loc:"3樓 3樓原左二排-左表 → 3B：9條",truck:"否"},
+  {spec:"205/75R16C",inch:"16吋",zone:"4D",qty:5,brand:"BS / 米",dot:"4025",priceMin:4700,priceMax:5400,origin:"",status:"正常",loc:"4樓 4樓原左四排 → 4D：5條",truck:"是"},
+  {spec:"215/60R16",inch:"16吋",zone:"3B",qty:5,brand:"P4+",dot:"4424",priceMin:3800,priceMax:3800,origin:"大",status:"正常",loc:"3樓 3樓原左二排-右表 → 3B：5條",truck:"否"},
+  {spec:"215/65R16",inch:"16吋",zone:"3B",qty:4,brand:"P5",dot:"3425",priceMin:4200,priceMax:4200,origin:"",status:"需補貨",loc:"3樓 3樓原左二排-右表 → 3B：4條",truck:"否"},
+  {spec:"215/70R16",inch:"16吋",zone:"3B",qty:4,brand:"SUV+",dot:"4125",priceMin:4300,priceMax:4300,origin:"大",status:"需補貨",loc:"3樓 3樓原左二排-右表 → 3B：4條",truck:"否"},
+  {spec:"215/70R16C",inch:"16吋",zone:"4D",qty:4,brand:"AG3",dot:"3525",priceMin:4300,priceMax:4300,origin:"泰",status:"需補貨",loc:"4樓 4樓原走道/貨車區 → 4D：4條",truck:"是"},
+  {spec:"225/60R16",inch:"16吋",zone:"3B",qty:2,brand:"PS4UV",dot:"4819",priceMin:0,priceMax:0,origin:"",status:"低庫存",loc:"3樓 3樓原左三排-左表 → 3B：2條",truck:"否"},
+  {spec:"235/45R16",inch:"16吋",zone:"3B",qty:2,brand:"P5",dot:"2825",priceMin:0,priceMax:0,origin:"",status:"低庫存",loc:"4樓 4樓原左一排-左表 → 3B：2條",truck:"否"},
+  {spec:"700R16C",inch:"16吋",zone:"4D",qty:4,brand:"正新",dot:"",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",loc:"4樓 4樓原左四排 → 4D：4條",truck:"是"},
+  {spec:"205/55R17",inch:"17吋",zone:"3C",qty:20,brand:"P5 / SA4",dot:"0726 / 4725",priceMin:4000,priceMax:4300,origin:"大",status:"正常",loc:"3樓 3樓原左二排-左表 → 3C：20條",truck:"否"},
+  {spec:"215/45R17",inch:"17吋",zone:"3C",qty:9,brand:"PS5 / P5",dot:"2025 / 4424",priceMin:4200,priceMax:5500,origin:"大",status:"正常",loc:"3樓 3樓原左二排-右表 → 3C：9條",truck:"否"},
+  {spec:"215/50R17",inch:"17吋",zone:"3C",qty:2,brand:"P5",dot:"2925",priceMin:4000,priceMax:4000,origin:"泰",status:"低庫存",loc:"3樓 3樓原左二排-左表 → 3C：2條",truck:"否"},
+  {spec:"215/55R17",inch:"17吋",zone:"3C",qty:22,brand:"P5 / 馬牌",dot:"0225 / 0726",priceMin:4000,priceMax:4300,origin:"大",status:"正常",loc:"3樓 3樓原左三排-左表 → 3C：22條",truck:"否"},
+  {spec:"215/60R17",inch:"17吋",zone:"3C",qty:16,brand:"P4+ / SA4",dot:"3225 / 4525",priceMin:4000,priceMax:4500,origin:"大 / 泰",status:"正常",loc:"3樓 3樓原左三排-左表 → 3C：10條 / 3樓 3樓原左三排-右表 → 3C：6條",truck:"否"},
+  {spec:"225/45R17",inch:"17吋",zone:"3C",qty:5,brand:"PS4",dot:"3421",priceMin:1000,priceMax:4500,origin:"",status:"正常",loc:"3樓 3樓原左二排-左表 → 3C：5條",truck:"否"},
+  {spec:"225/50R17",inch:"17吋",zone:"3C",qty:6,brand:"P4 / P5",dot:"2025 / 3624",priceMin:4000,priceMax:4500,origin:"大",status:"正常",loc:"3樓 3樓原左二排-右表 → 3C：6條",truck:"否"},
+  {spec:"225/55R17",inch:"17吋",zone:"3C",qty:28,brand:"P4 / P5 / 馬牌",dot:"1124 / 3025 / 3325",priceMin:4300,priceMax:4500,origin:"大",status:"正常",loc:"3樓 3樓原左三排-左表 → 3C：11條 / 3樓 3樓原左三排-右表 → 3C：9條 / 4樓 4樓原左二排-右表 → 3C：8條",truck:"否"},
+  {spec:"225/55R17C",inch:"17吋",zone:"4D",qty:4,brand:"AG3",dot:"1424",priceMin:3800,priceMax:3800,origin:"",status:"需補貨",loc:"4樓 4樓原左四排 → 4D：4條",truck:"是"},
+  {spec:"225/60R17",inch:"17吋",zone:"3C",qty:10,brand:"P4 / SA4",dot:"2225 / 3725",priceMin:4300,priceMax:4500,origin:"大",status:"正常",loc:"3樓 3樓原左三排-右表 → 3C：10條",truck:"否"},
+  {spec:"225/65R17",inch:"17吋",zone:"3C",qty:22,brand:"P4 / SUV+",dot:"1224 / 3925",priceMin:4500,priceMax:4800,origin:"大",status:"正常",loc:"3樓 3樓原左三排-右表 → 3C：10條 / 4樓 4樓原左二排-左表 → 3C：12條",truck:"否"},
+  {spec:"225/75R17.5",inch:"17.5吋",zone:"4D",qty:2,brand:"米",dot:"0625",priceMin:9000,priceMax:9000,origin:"泰",status:"低庫存",loc:"4樓 4樓原左三排 → 4D：2條",truck:"是"},
+  {spec:"235/55R17",inch:"17吋",zone:"3C",qty:4,brand:"P4 / 3ST",dot:"2020",priceMin:2000,priceMax:2000,origin:"大",status:"需補貨",loc:"4樓 4樓原左二排-右表 → 3C：4條",truck:"否"},
+  {spec:"215/45R18",inch:"18吋",zone:"3D",qty:12,brand:"PS5 / P5",dot:"2025 / 3424",priceMin:4500,priceMax:6000,origin:"大",status:"正常",loc:"4樓 4樓原左二排-右表 → 3D：12條",truck:"否"},
+  {spec:"215/50R18",inch:"18吋",zone:"3D",qty:4,brand:"SUV+",dot:"2625",priceMin:5400,priceMax:5400,origin:"",status:"需補貨",loc:"3樓 3樓原左四排-右表 → 3D：4條",truck:"否"},
+  {spec:"215/55R18",inch:"18吋",zone:"3D",qty:4,brand:"油電",dot:"3523 1624",priceMin:5300,priceMax:5300,origin:"大",status:"需補貨",loc:"4樓 4樓原左二排-右表 → 3D：4條",truck:"否"},
+  {spec:"225/40R18",inch:"18吋",zone:"3D",qty:16,brand:"PS5 / P5",dot:"0926 / 2325",priceMin:5500,priceMax:7000,origin:"大",status:"正常",loc:"3樓 3樓原左四排-左表 → 3D：12條 / 4樓 4樓原左一排-左表 → 3D：4條",truck:"否"},
+  {spec:"225/45R18",inch:"18吋",zone:"3D",qty:22,brand:"PS5 / P5 / SA4",dot:"1024 / 2025 / 3225",priceMin:5000,priceMax:6000,origin:"大 / 泰",status:"正常",loc:"3樓 3樓原左三排-左表 → 3D：8條 / 3樓 3樓原左三排-右表 → 3D：6條 / 4樓 4樓原左二排-右表 → 3D：8條",truck:"否"},
+  {spec:"225/50R18",inch:"18吋",zone:"3D",qty:18,brand:"P5 / SA4 / 油電",dot:"0126 / 0926 / 3925",priceMin:5000,priceMax:5500,origin:"大",status:"正常",loc:"3樓 3樓原左三排-左表 → 3D：6條 / 3樓 3樓原左三排-右表 → 3D：6條 / 4樓 4樓原左一排-右表 → 3D：6條",truck:"否"},
+  {spec:"225/55R18",inch:"18吋",zone:"3D",qty:8,brand:"PS5 / SUV+",dot:"3724 / 4224",priceMin:5000,priceMax:5000,origin:"",status:"正常",loc:"3樓 3樓原左四排-左表 → 3D：4條 / 3樓 3樓原左二排-右表 → 3D：4條",truck:"否"},
+  {spec:"225/60R18",inch:"18吋",zone:"3D",qty:27,brand:"P5 / SUV+ / 油電",dot:"0626 / 0926 / 3925 / 4525",priceMin:5200,priceMax:5200,origin:"大",status:"正常",loc:"3樓 3樓原左三排-右表 → 3D：17條 / 4樓 4樓原左一排-右表 → 3D：10條",truck:"否"},
+  {spec:"235/40R18",inch:"18吋",zone:"3D",qty:4,brand:"P4+",dot:"2825",priceMin:0,priceMax:0,origin:"",status:"需補貨",loc:"4樓 4樓原左二排-左表 → 3D：4條",truck:"否"},
+  {spec:"235/45R18",inch:"18吋",zone:"3D",qty:16,brand:"P5P / PS5 / 油電",dot:"1126 / 4124",priceMin:6000,priceMax:6200,origin:"大",status:"正常",loc:"3樓 3樓原左三排-右表 → 3D：4條 / 4樓 4樓原左二排-右表 → 3D：8條 / 4樓 4樓原左三排 → 3D：4條",truck:"否"},
+  {spec:"235/50R18",inch:"18吋",zone:"3D",qty:14,brand:"P5 / PS5",dot:"1025 / 1524",priceMin:5500,priceMax:5500,origin:"大",status:"正常",loc:"3樓 3樓原左四排-右表 → 3D：4條 / 3樓 3樓原左二排-右表 → 3D：10條",truck:"否"},
+  {spec:"235/55R18",inch:"18吋",zone:"3D",qty:23,brand:"LS3 / P4 / P5 / 油電",dot:"0122 / 0525 / 1124 / 3025",priceMin:520,priceMax:5500,origin:"大 / 歐",status:"正常",loc:"3樓 3樓原左四排-左表 → 3D：9條 / 3樓 3樓原左四排-右表 → 3D：8條 / 4樓 4樓原左一排-左表 → 3D：6條",truck:"否"},
+  {spec:"235/60R18",inch:"18吋",zone:"3D",qty:25,brand:"EP / HP / P5 / SUV+",dot:"0926 / 2225 / 3824 / 1325",priceMin:2000,priceMax:5300,origin:"大 / 泰",status:"正常",loc:"4樓 4樓原左一排-右表 → 3D：12條 / 4樓 4樓原左三排 → 3D：5條 / 4樓 4樓原左二排-左表 → 3D：8條",truck:"否"},
+  {spec:"245/40R18",inch:"18吋",zone:"3D",qty:5,brand:"PS4 / PS5",dot:"3424",priceMin:2000,priceMax:7000,origin:"大",status:"正常",loc:"3樓 3樓原左四排-左表 → 3D：2條 / 4樓 4樓原左一排-右表 → 3D：3條",truck:"否"},
+  {spec:"245/45R18",inch:"18吋",zone:"3D",qty:7,brand:"PS5 / 防爆",dot:"1922 0622",priceMin:4000,priceMax:8000,origin:"歐",status:"正常",loc:"4樓 4樓原左一排-右表 → 3D：4條 / 4樓 4樓原左二排-左表 → 3D：3條",truck:"否"},
+  {spec:"245/50R18",inch:"18吋",zone:"3D",qty:6,brand:"P4+ / 防爆",dot:"1924 / 352",priceMin:6000,priceMax:9500,origin:"大 / 歐",status:"正常",loc:"3樓 3樓原左四排-左表 → 3D：6條",truck:"否"},
+  {spec:"255/40R18",inch:"18吋",zone:"3D",qty:2,brand:"P4",dot:"3922",priceMin:4000,priceMax:4000,origin:"",status:"低庫存",loc:"3樓 3樓原左四排-右表 → 3D：2條",truck:"否"},
+  {spec:"225/55R19",inch:"19吋",zone:"4A",qty:9,brand:"PS4SUV / SUV+",dot:"0126 / 2021",priceMin:2000,priceMax:7000,origin:"",status:"正常",loc:"3樓 3樓原左四排-左表 → 4A：8條 / 3樓 3樓原左四排-右表 → 4A：1條",truck:"否"},
+  {spec:"235/35R19",inch:"19吋",zone:"4A",qty:1,brand:"PS4S",dot:"0119",priceMin:0,priceMax:0,origin:"",status:"低庫存",loc:"4樓 4樓原左二排-左表 → 4A：1條",truck:"否"},
+  {spec:"235/40R19",inch:"19吋",zone:"4A",qty:4,brand:"PS5 / 油電",dot:"2425 / 3225",priceMin:8500,priceMax:8500,origin:"大",status:"需補貨",loc:"3樓 3樓原左四排-左表 → 4A：2條 / 4樓 4樓原左三排 → 4A：2條",truck:"否"},
+  {spec:"235/50R19",inch:"19吋",zone:"4A",qty:3,brand:"P5 / PS4",dot:"0426 / 2021",priceMin:2500,priceMax:8000,origin:"",status:"需補貨",loc:"4樓 4樓原左三排 → 4A：2條 / 4樓 4樓原左四排 → 4A：1條",truck:"否"},
+  {spec:"235/55R19",inch:"19吋",zone:"4A",qty:12,brand:"HP / PS4SUV",dot:"0224 / 2225",priceMin:6000,priceMax:7500,origin:"大",status:"正常",loc:"3樓 3樓原左四排-左表 → 4A：4條 / 4樓 4樓原左三排 → 4A：4條 / 4樓 4樓原左二排-左表 → 4A：4條",truck:"否"},
+  {spec:"245/40R19",inch:"19吋",zone:"4A",qty:6,brand:"PS4S / PS5",dot:"3424 / 4223",priceMin:8000,priceMax:8500,origin:"",status:"正常",loc:"3樓 3樓原左四排-左表 → 4A：2條 / 3樓 3樓原左三排-左表 → 4A：4條",truck:"否"},
+  {spec:"245/45R19",inch:"19吋",zone:"4A",qty:2,brand:"倍耐力",dot:"2022 / 2122",priceMin:4000,priceMax:5000,origin:"義",status:"低庫存",loc:"3樓 3樓原左四排-右表 → 4A：1條 / 4樓 4樓原走道/貨車區 → 4A：1條",truck:"否"},
+  {spec:"245/50R19",inch:"19吋",zone:"4A",qty:4,brand:"P3",dot:"1224",priceMin:9000,priceMax:9000,origin:"大",status:"需補貨",loc:"3樓 3樓原左四排-右表 → 4A：4條",truck:"否"},
+  {spec:"255/45R19",inch:"19吋",zone:"4A",qty:9,brand:"EV / PS4 / PS5/E",dot:"0325 / 0626 / 2623",priceMin:9500,priceMax:9500,origin:"大",status:"正常",loc:"3樓 3樓原左四排-右表 → 4A：4條 / 4樓 4樓原左二排-左表 → 4A：5條",truck:"否"},
+  {spec:"275/35R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2624",priceMin:9500,priceMax:9500,origin:"",status:"低庫存",loc:"3樓 3樓原左四排-右表 → 4A：2條",truck:"否"},
+  {spec:"235/55R20",inch:"20吋",zone:"4B",qty:8,brand:"SUV+",dot:"4525",priceMin:9000,priceMax:9000,origin:"大",status:"正常",loc:"4樓 4樓原左一排-左表 → 4B：8條",truck:"否"},
+  {spec:"275/50R20",inch:"20吋",zone:"4B",qty:2,brand:"PS4 / SUV",dot:"3924",priceMin:0,priceMax:0,origin:"",status:"低庫存",loc:"4樓 4樓原左一排-左表 → 4B：2條",truck:"否"},
+  {spec:"265/45R21",inch:"21吋",zone:"4B",qty:2,brand:"P5",dot:"",priceMin:0,priceMax:0,origin:"",status:"低庫存",loc:"4樓 4樓原左一排-左表 → 4B：2條",truck:"否"},
+  {spec:"295/30R22",inch:"22吋",zone:"4B",qty:2,brand:"馬",dot:"3722",priceMin:6000,priceMax:6000,origin:"",status:"低庫存",loc:"4樓 4樓原走道/貨車區 → 4B：2條",truck:"否"},
+];
+
+const ZONES_INFO = {
+  "3A":{label:"15吋以下",type:"一般轎車胎",floor:"3樓A區"},
+  "3B":{label:"16吋",type:"一般轎車胎",floor:"3樓B區"},
+  "3C":{label:"17吋",type:"一般轎車胎",floor:"3樓C區"},
+  "3D":{label:"18吋",type:"一般轎車胎",floor:"3樓D區"},
+  "4A":{label:"19吋",type:"一般轎車胎",floor:"4樓A區"},
+  "4B":{label:"20吋以上",type:"SUV/大型胎",floor:"4樓B區"},
+  "4C":{label:"貨車胎 15吋以下",type:"貨車胎",floor:"4樓C區"},
+  "4D":{label:"貨車胎 16吋以上",type:"貨車胎",floor:"4樓D區"},
+};
+
+// ── State ──
+let inventory = loadInventory();
+let addedItems = [];
+
+function loadInventory() {
+  try {
+    const raw = sessionStorage.getItem(INVENTORY_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(BASE_DATA));
+}
+function saveInventory() {
+  try { sessionStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory)); } catch(e) {}
+}
+
+// ── Navigation ──
+const PAGE_TITLES = {
+  overview: ['總覽儀表板','所有倉位庫存概況'],
+  search: ['規格查詢','輸入規格快速查詢庫存與位置'],
+  add: ['新增庫存','登記入庫的新輪胎'],
+  zones: ['倉位庫存','點選倉位查看詳細品項'],
+  all: ['全部品項','所有庫存一覽'],
+  alerts: ['低庫存警示','需注意或補貨的規格'],
+};
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelector(`.nav-item[onclick="goPage('${id}')"]`).classList.add('active');
+  const [title, sub] = PAGE_TITLES[id];
+  document.getElementById('page-title').textContent = title;
+  document.getElementById('page-sub').textContent = sub;
+  if (id === 'overview') renderOverview();
+  if (id === 'zones') renderZones();
+  if (id === 'all') renderAll();
+  if (id === 'alerts') renderAlerts();
+}
+
+function pillClass(status) {
+  if (status === '正常') return 'pill-ok';
+  if (status === '低庫存') return 'pill-warn';
+  return 'pill-low';
+}
+
+// ── Overview ──
+function renderOverview() {
+  // Compute zone totals
+  const zoneTotals = {};
+  const zoneSpecs = {};
+  inventory.forEach(t => {
+    zoneTotals[t.zone] = (zoneTotals[t.zone]||0) + t.qty;
+    if (!zoneSpecs[t.zone]) zoneSpecs[t.zone] = new Set();
+    zoneSpecs[t.zone].add(t.spec);
+  });
+  const maxTotal = Math.max(...Object.values(zoneTotals));
+
+  const alertCount = inventory.filter(t => t.status === '低庫存' || t.status === '需補貨').length;
+  const restockCount = inventory.filter(t => t.status === '需補貨').length;
+  document.getElementById('ov-alert-count').innerHTML = alertCount+'<span class="unit">種</span>';
+  document.getElementById('ov-restock-count').innerHTML = restockCount+'<span class="unit">種</span>';
+
+  const tbody = document.getElementById('zone-summary-body');
+  tbody.innerHTML = Object.keys(ZONES_INFO).map(z => {
+    const info = ZONES_INFO[z];
+    const total = zoneTotals[z]||0;
+    const specs = zoneSpecs[z] ? zoneSpecs[z].size : 0;
+    const pct = maxTotal ? Math.round(total/maxTotal*100) : 0;
+    return `<tr>
+      <td><span class="pill pill-zone">${z}</span></td>
+      <td>${info.label}</td>
+      <td><span style="color:var(--text-secondary)">${specs}</span></td>
+      <td><span class="qty-num">${total}</span></td>
+      <td style="width:200px">
+        <div style="background:var(--dark);border-radius:4px;height:8px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:var(--accent);border-radius:4px;transition:width 0.5s"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Size distribution
+  const sizeData = [
+    {label:'13吋', val: inventory.filter(t=>t.inch==='13吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'14吋', val: inventory.filter(t=>t.inch==='14吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'15吋', val: inventory.filter(t=>t.inch==='15吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'16吋', val: inventory.filter(t=>t.inch==='16吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'17吋', val: inventory.filter(t=>t.inch==='17吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'17.5吋',val: inventory.filter(t=>t.inch==='17.5吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'18吋', val: inventory.filter(t=>t.inch==='18吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'19吋', val: inventory.filter(t=>t.inch==='19吋').reduce((s,t)=>s+t.qty,0)},
+    {label:'20吋+',val: inventory.filter(t=>['20吋','21吋','22吋'].includes(t.inch)).reduce((s,t)=>s+t.qty,0)},
+  ];
+  const maxSize = Math.max(...sizeData.map(s=>s.val));
+  document.getElementById('size-chart').innerHTML = sizeData.map(s => {
+    const pct = maxSize ? Math.round(s.val/maxSize*100) : 0;
+    return `<div class="chart-row">
+      <div class="bar-label">${s.label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pct}%">
+          ${pct > 12 ? `<span class="bar-fill-inner">${s.val}</span>` : ''}
+        </div>
+      </div>
+      <div class="bar-val">${s.val}</div>
+    </div>`;
+  }).join('');
+
+  // Sidebar stats
+  const total = inventory.reduce((s,t)=>s+t.qty,0);
+  document.getElementById('sb-total').textContent = total;
+  document.getElementById('sb-specs').textContent = inventory.length;
+  document.getElementById('sb-low').textContent = alertCount;
+  document.getElementById('alertBadge').textContent = alertCount;
+}
+
+// ── Search ──
+function searchTire() {
+  const q = document.getElementById('search-input').value.trim().toUpperCase();
+  const zoneF = document.getElementById('search-zone').value;
+  const statusF = document.getElementById('search-status').value;
+
+  const resultCard = document.getElementById('result-card');
+  resultCard.classList.remove('show');
+
+  let results = inventory.filter(t => {
+    const matchSpec = !q || t.spec.toUpperCase().includes(q) || t.brand.toUpperCase().includes(q);
+    const matchZone = !zoneF || t.zone === zoneF;
+    const matchStatus = !statusF || t.status === statusF;
+    return matchSpec && matchZone && matchStatus;
+  });
+
+  document.getElementById('search-result-count').textContent = results.length + ' 筆';
+
+  // Exact match → show detail card
+  if (q) {
+    const exact = inventory.find(t => t.spec.toUpperCase() === q);
+    if (exact) showResultCard(exact);
+  }
+
+  const tbody = document.getElementById('search-results-body');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="icon">🔍</div><div class="msg">找不到符合條件的規格</div></div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = results.map(t => {
+    const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
+      ? `$${t.priceMin.toLocaleString()}`
+      : (t.priceMin || t.priceMax ? `$${(t.priceMin||0).toLocaleString()}–${(t.priceMax||0).toLocaleString()}` : '—');
+    return `<tr style="cursor:pointer" onclick="showResultCard(inventory.find(x=>x.spec==='${t.spec}'))">
+      <td><span class="spec-mono">${t.spec}</span></td>
+      <td style="color:var(--text-muted)">${t.inch}</td>
+      <td><span class="pill pill-zone">${t.zone}</span></td>
+      <td><span class="qty-num">${t.qty}</span></td>
+      <td style="color:var(--text-secondary)">${t.brand}</td>
+      <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${t.dot||'—'}</td>
+      <td class="price-range">${priceStr}</td>
+      <td><span class="pill ${pillClass(t.status)}">${t.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();showResultCard(inventory.find(x=>x.spec==='${t.spec}'))">詳情</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function showResultCard(t) {
+  if (!t) return;
+  const card = document.getElementById('result-card');
+  document.getElementById('res-spec').textContent = t.spec;
+  document.getElementById('res-inch').textContent = t.inch + ' · ' + (ZONES_INFO[t.zone]?.type||'');
+  document.getElementById('res-qty').textContent = t.qty + ' 條';
+  document.getElementById('res-zone').textContent = t.zone + ' (' + (ZONES_INFO[t.zone]?.floor||'') + ')';
+  document.getElementById('res-brand').textContent = t.brand||'—';
+  document.getElementById('res-dot').textContent = t.dot||'—';
+  const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
+    ? `NT$ ${t.priceMin.toLocaleString()}`
+    : (t.priceMin || t.priceMax ? `NT$ ${(t.priceMin||0).toLocaleString()} – ${(t.priceMax||0).toLocaleString()}` : '未標價');
+  document.getElementById('res-price').textContent = priceStr;
+  document.getElementById('res-origin').textContent = t.origin||'—';
+  const badge = document.getElementById('res-badge');
+  badge.textContent = t.status;
+  badge.className = 'result-badge ' + (t.status==='正常'?'badge-ok':t.status==='低庫存'?'badge-low':'badge-warn');
+
+  // Parse locations
+  const locs = t.loc ? t.loc.split(' / ') : [];
+  const locHtml = locs.length ? locs.map(l => {
+    const parts = l.split(' → ');
+    const place = parts[0]||l;
+    const detail = parts[1]||'';
+    const countMatch = detail.match(/：(\d+)條/);
+    const count = countMatch ? countMatch[1] : '';
+    return `<div class="location-item">
+      <div class="loc-info">
+        <div class="loc-name">${place}</div>
+        ${detail ? `<div class="loc-detail">${detail}</div>` : ''}
+      </div>
+      ${count ? `<div class="loc-count">${count}</div>` : ''}
+    </div>`;
+  }).join('') : '<div style="color:var(--text-muted);font-size:13px;padding:8px">無位置資料</div>';
+
+  document.getElementById('res-locations').innerHTML = locHtml;
+  card.classList.add('show');
+  card.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function clearSearch() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-zone').value = '';
+  document.getElementById('search-status').value = '';
+  document.getElementById('result-card').classList.remove('show');
+  document.getElementById('search-results-body').innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="icon">🔍</div><div class="msg">輸入規格關鍵字以開始查詢</div></div></td></tr>';
+  document.getElementById('search-result-count').textContent = '輸入規格以查詢';
+}
+
+// ── Add ──
+function addInventory() {
+  const spec = document.getElementById('add-spec').value.trim();
+  const brand = document.getElementById('add-brand').value.trim();
+  const qty = parseInt(document.getElementById('add-qty').value);
+  if (!spec || !brand || !qty || qty < 1) {
+    showToast('⚠️ 請填寫規格、型號及數量！');
+    return;
+  }
+  const price = parseInt(document.getElementById('add-price').value)||0;
+  const dot = document.getElementById('add-dot').value.trim();
+  const origin = document.getElementById('add-origin').value;
+  const floor = document.getElementById('add-floor').value;
+  const location = document.getElementById('add-location').value.trim();
+  const zone = document.getElementById('add-zone').value;
+  const truck = document.getElementById('add-truck').value;
+  const note = document.getElementById('add-note').value.trim();
+
+  // Normalize spec
+  const normSpec = spec.toUpperCase().replace(/\s/g,'');
+  const inch = guessInch(normSpec);
+
+  // Check if spec exists → update qty
+  const existing = inventory.find(t => t.spec.toUpperCase() === normSpec);
+  if (existing) {
+    existing.qty += qty;
+    if (location) existing.loc += ' / ' + floor + ' ' + location + ' → ' + zone + '：' + qty + '條';
+    if (existing.status !== '正常' && existing.qty > 4) existing.status = '正常';
+    showToast(`✅ 已更新 ${normSpec} 庫存，新增 ${qty} 條`);
+  } else {
+    const locStr = location ? `${floor} ${location} → ${zone}：${qty}條` : '';
+    inventory.push({
+      spec: normSpec, inch, zone, qty, brand, dot, priceMin: price, priceMax: price,
+      origin, status: qty <= 2 ? '低庫存' : qty <= 4 ? '需補貨' : '正常',
+      loc: locStr, truck
+    });
+    showToast(`✅ 已新增 ${normSpec} × ${qty} 條`);
+  }
+
+  addedItems.unshift({spec: normSpec, brand, qty, dot, price, zone, location: location||'—'});
+  saveInventory();
+  renderAddedList();
+  clearAddForm();
+  renderOverview();
+}
+
+function guessInch(spec) {
+  const m = spec.match(/R(\d+)/i);
+  if (m) {
+    const n = parseInt(m[1]);
+    if (n <= 15) return n+'吋';
+    return n+'吋';
+  }
+  return '?吋';
+}
+
+function clearAddForm() {
+  ['add-spec','add-brand','add-qty','add-price','add-dot','add-location','add-note'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('add-origin').value = '';
+  document.getElementById('add-truck').value = '否';
+}
+
+function renderAddedList() {
+  const tbody = document.getElementById('added-list');
+  document.getElementById('added-count').textContent = addedItems.length + ' 筆';
+  if (!addedItems.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">📦</div><div class="msg">尚未新增任何庫存</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = addedItems.map(i => `
+    <tr>
+      <td><span class="spec-mono">${i.spec}</span></td>
+      <td style="color:var(--text-secondary)">${i.brand}</td>
+      <td><span class="qty-num">${i.qty}</span></td>
+      <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${i.dot||'—'}</td>
+      <td class="price-range">${i.price ? 'NT$'+i.price.toLocaleString() : '—'}</td>
+      <td><span class="pill pill-zone">${i.zone}</span></td>
+      <td style="color:var(--text-muted);font-size:12px">${i.location}</td>
+    </tr>`).join('');
+}
+
+// ── Zones ──
+function renderZones() {
+  const zoneTotals = {};
+  const zoneSpecs = {};
+  inventory.forEach(t => {
+    zoneTotals[t.zone] = (zoneTotals[t.zone]||0) + t.qty;
+    if (!zoneSpecs[t.zone]) zoneSpecs[t.zone] = 0;
+    zoneSpecs[t.zone]++;
+  });
+  const maxTotal = Math.max(...Object.values(zoneTotals));
+
+  document.getElementById('zone-cards').innerHTML = Object.keys(ZONES_INFO).map(z => {
+    const info = ZONES_INFO[z];
+    const total = zoneTotals[z]||0;
+    const specs = zoneSpecs[z]||0;
+    const pct = maxTotal ? Math.round(total/maxTotal*100) : 0;
+    return `<div class="zone-card" onclick="openZoneDetail('${z}')">
+      <div class="zone-tag">${z}</div>
+      <div class="zone-type">${info.label} · ${info.type}</div>
+      <div class="zone-stats">
+        <div class="zone-stat"><div class="label">總條數</div><div class="value">${total}</div></div>
+        <div class="zone-stat"><div class="label">規格數</div><div class="value">${specs}</div></div>
+        <div class="zone-stat"><div class="label">位置</div><div class="value" style="font-size:13px;color:var(--text-secondary)">${info.floor}</div></div>
+      </div>
+      <div class="zone-bar-wrap"><div class="zone-bar" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function openZoneDetail(zone) {
+  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+
+  const items = inventory.filter(t => t.zone === zone);
+  document.getElementById('zone-detail-title').textContent = zone + ' · ' + (ZONES_INFO[zone]?.label||'') + '（' + items.length + ' 規格 / ' + items.reduce((s,t)=>s+t.qty,0) + ' 條）';
+
+  document.getElementById('zone-detail-body').innerHTML = items.map(t => {
+    const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
+      ? `$${t.priceMin.toLocaleString()}`
+      : (t.priceMin||t.priceMax ? `$${(t.priceMin||0).toLocaleString()}~${(t.priceMax||0).toLocaleString()}` : '—');
+    return `<tr>
+      <td><span class="spec-mono">${t.spec}</span></td>
+      <td style="color:var(--text-secondary)">${t.brand}</td>
+      <td><span class="qty-num">${t.qty}</span></td>
+      <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${t.dot||'—'}</td>
+      <td class="price-range">${priceStr}</td>
+      <td><span class="pill ${pillClass(t.status)}">${t.status}</span></td>
+      <td style="color:var(--text-muted);font-size:11px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.loc||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  const panel = document.getElementById('zone-detail');
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function closeZoneDetail() {
+  document.getElementById('zone-detail').classList.remove('show');
+  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('selected'));
+}
+
+// ── All ──
+function renderAll() { filterAll(); }
+
+function filterAll() {
+  const q = document.getElementById('all-filter').value.trim().toUpperCase();
+  const zone = document.getElementById('all-zone-filter').value;
+  const status = document.getElementById('all-status-filter').value;
+
+  const results = inventory.filter(t => {
+    const matchQ = !q || t.spec.toUpperCase().includes(q) || t.brand.toUpperCase().includes(q);
+    const matchZ = !zone || t.zone === zone;
+    const matchS = !status || t.status === status;
+    return matchQ && matchZ && matchS;
+  });
+
+  document.getElementById('all-count').textContent = `共 ${results.length} 筆 / 合計 ${results.reduce((s,t)=>s+t.qty,0)} 條`;
+
+  const tbody = document.getElementById('all-body');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="icon">📋</div><div class="msg">沒有符合條件的品項</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = results.map(t => {
+    const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
+      ? `$${t.priceMin.toLocaleString()}`
+      : (t.priceMin||t.priceMax ? `$${(t.priceMin||0).toLocaleString()}~${(t.priceMax||0).toLocaleString()}` : '—');
+    return `<tr>
+      <td><span class="spec-mono">${t.spec}</span></td>
+      <td style="color:var(--text-muted)">${t.inch}</td>
+      <td><span class="pill pill-zone">${t.zone}</span></td>
+      <td><span class="qty-num">${t.qty}</span></td>
+      <td style="color:var(--text-secondary)">${t.brand}</td>
+      <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${t.dot||'—'}</td>
+      <td class="price-range">${priceStr}</td>
+      <td style="color:var(--text-secondary)">${t.origin||'—'}</td>
+      <td><span class="pill ${pillClass(t.status)}">${t.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Alerts ──
+function renderAlerts() {
+  const critical = inventory.filter(t => t.qty <= 2);
+  const warn = inventory.filter(t => t.qty > 2 && t.qty <= 4);
+  document.getElementById('al-critical').innerHTML = critical.length + '<span class="unit">種</span>';
+  document.getElementById('al-warn').innerHTML = warn.length + '<span class="unit">種</span>';
+
+  const alerts = inventory.filter(t => t.status !== '正常').sort((a,b) => a.qty - b.qty);
+  document.getElementById('alert-list').innerHTML = alerts.length ? alerts.map(t => {
+    const isCritical = t.qty <= 2;
+    return `<div class="alert-item">
+      <div class="alert-dot ${isCritical?'low':'warn'}"></div>
+      <div class="alert-info">
+        <div class="alert-spec">${t.spec}</div>
+        <div class="alert-meta">${t.inch} · 倉位 ${t.zone} · 型號：${t.brand||'—'} · DOT: ${t.dot||'—'}</div>
+        <div class="alert-meta" style="margin-top:2px;font-size:11px">${t.loc||''}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="alert-count">${t.qty}<span style="font-size:12px;color:var(--text-muted);font-weight:400"> 條</span></div>
+        <span class="pill ${pillClass(t.status)}" style="margin-top:4px;display:inline-block">${t.status}</span>
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty-state"><div class="icon">✅</div><div class="msg">目前無低庫存警示</div></div>';
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Init ──
+renderOverview();
+</script>
+</body>
+</html>
