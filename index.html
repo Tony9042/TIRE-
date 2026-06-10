@@ -197,7 +197,7 @@
     font-family: inherit;
     outline: none;
     transition: border-color 0.15s;
-    min-width: 200px;
+    min-width: 160px;
   }
   input[type="text"]:focus, select:focus { border-color: var(--accent); }
   input[type="text"]::placeholder { color: var(--text-muted); }
@@ -470,6 +470,100 @@
   #print-header h1 { font-size: 18pt; font-weight: 700; color: #000; }
   #print-header p { font-size: 11pt; color: #444; margin-top: 4px; }
 
+  /* ── Mobile Sidebar Overlay ── */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+  }
+  .sidebar-overlay.show { display: block; }
+
+  .hamburger {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    padding: 7px 10px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  /* ── RWD Breakpoints ── */
+
+  /* Tablet: 640px – 1023px */
+  @media (max-width: 1023px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .zone-grid { grid-template-columns: repeat(2, 1fr); }
+    .content { padding: 16px 18px; }
+    .topbar { padding: 14px 18px; }
+  }
+
+  /* Mobile: < 640px */
+  @media (max-width: 639px) {
+    .hamburger { display: block; }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 300;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      width: 240px;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .topbar { padding: 12px 16px; gap: 8px; }
+    .topbar h1 { font-size: 15px; }
+    .topbar .subtitle { display: none; }
+    .topbar-actions { gap: 6px; }
+
+    .content { padding: 12px 14px; }
+
+    .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card .value { font-size: 22px; }
+
+    .zone-grid { grid-template-columns: 1fr; gap: 10px; }
+
+    .form-grid { grid-template-columns: 1fr; gap: 14px; }
+
+    .search-row { flex-direction: column; align-items: stretch; }
+    .search-row .form-group { width: 100%; }
+
+    .filter-bar { gap: 8px; }
+    .filter-bar input,
+    .filter-bar select { min-width: unset; width: 100%; }
+
+    .result-meta { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+    .zone-stats { flex-wrap: wrap; gap: 12px; }
+
+    .table-wrapper { overflow-x: auto; }
+    table { min-width: 560px; }
+
+    .modal { padding: 20px 16px; }
+
+    .toast { bottom: 16px; right: 16px; left: 16px; }
+
+    /* Log date range filters: stack */
+    #page-log .filter-bar { flex-direction: column; align-items: stretch; }
+    #page-log .filter-bar input[type="date"] { width: 100%; }
+    #page-log .filter-bar span { display: none; }
+
+    /* Alert stats: 1 col */
+    #page-alerts .stat-grid { grid-template-columns: 1fr; }
+    #page-log .stat-grid { grid-template-columns: 1fr; }
+
+    /* Shipout form */
+    #page-shipout .form-section { max-width: 100%; }
+
+    /* Sync page */
+    #page-sync .form-section { max-width: 100%; }
+  }
+
   /* ── scrollbar ── */
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -523,10 +617,11 @@
 </head>
 <body>
 
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div class="app-shell">
 
   <!-- Sidebar -->
-  <nav class="sidebar">
+  <nav class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="brand">統玉輪胎</div>
       <div class="sub">庫存管理系統</div>
@@ -582,6 +677,7 @@
       </div>
       <div class="topbar-actions">
         <span style="font-size:12px;color:var(--text-muted)">最後更新：2025/07</span>
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
       </div>
     </div>
 
@@ -1047,10 +1143,6 @@
 // ══════════════════════════════════════
 const INVENTORY_KEY = 'tongyu_inventory_v2';
 
-const LOC_DATA = {"165R14":[{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":10,"brand":"AG3"}],"175/65R14":[{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":6,"brand":"SA4"}],"185/60R14":[{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":5,"brand":"XM2"},{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":4,"brand":"XM2"}],"185/65R14":[{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":4,"brand":"SA4"}],"185/55R15":[{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":7,"brand":"PS3"}],"185/60R15":[{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":4,"brand":"P4"},{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":8,"brand":"XM2"}],"185/65R15":[{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":8,"brand":"P4"},{"floor":"3樓","pos":"原左二排-左表","zone":"3A","qty":6,"brand":"SA4"},{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":4,"brand":"SA4"}],"195/50R15":[{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":2,"brand":"P4+"}],"195/55R15":[{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":4,"brand":"SA4"}],"195/60R15":[{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":5,"brand":"XM2"}],"195/65R15":[{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":8,"brand":"P4"},{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":9,"brand":"P4"},{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":4,"brand":"SA4"},{"floor":"3樓","pos":"原左一排-左表","zone":"3A","qty":6,"brand":"SA4"},{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":4,"brand":"南港"}],"205/65R15":[{"floor":"3樓","pos":"原左一排-右表","zone":"3A","qty":3,"brand":"SA4"}],"205/70R15":[{"floor":"3樓","pos":"原左二排-左表","zone":"3A","qty":5,"brand":"SUV+"},{"floor":"4樓","pos":"原左四排","zone":"3A","qty":4,"brand":"南港"}],"225/70R15":[{"floor":"4樓","pos":"原左三排","zone":"3A","qty":2,"brand":"吉星"}],"185/55R16":[{"floor":"3樓","pos":"原左一排-左表","zone":"3B","qty":2,"brand":"BS"},{"floor":"3樓","pos":"原左一排-左表","zone":"3B","qty":4,"brand":"SA4"}],"195/50R16":[{"floor":"3樓","pos":"原左一排-右表","zone":"3B","qty":2,"brand":"BS"}],"195/55R16":[{"floor":"3樓","pos":"原左一排-右表","zone":"3B","qty":4,"brand":"BS"},{"floor":"3樓","pos":"原左一排-右表","zone":"3B","qty":2,"brand":"P4"},{"floor":"3樓","pos":"原左一排-右表","zone":"3B","qty":4,"brand":"P5"},{"floor":"4樓","pos":"原左四排","zone":"3B","qty":4,"brand":"防爆"}],"195/60R16":[{"floor":"3樓","pos":"原左一排-左表","zone":"3B","qty":6,"brand":"P4+"}],"205/45R16":[{"floor":"3樓","pos":"原左一排-左表","zone":"3B","qty":1,"brand":"PS3"}],"205/55R16":[{"floor":"3樓","pos":"原左二排-左表","zone":"3B","qty":1,"brand":"P5"},{"floor":"3樓","pos":"原左二排-左表","zone":"3B","qty":8,"brand":"SA4"}],"205/60R16":[{"floor":"3樓","pos":"原左一排-右表","zone":"3B","qty":3,"brand":"P4+"},{"floor":"3樓","pos":"原左一排-右表","zone":"3B","qty":8,"brand":"P5"},{"floor":"3樓","pos":"原左二排-左表","zone":"3B","qty":4,"brand":"XM2"}],"215/60R16":[{"floor":"3樓","pos":"原左二排-右表","zone":"3B","qty":1,"brand":"P4"},{"floor":"3樓","pos":"原左二排-右表","zone":"3B","qty":8,"brand":"P4+"},{"floor":"3樓","pos":"原左二排-右表","zone":"3B","qty":5,"brand":"P4+"},{"floor":"3樓","pos":"原左二排-右表","zone":"3B","qty":4,"brand":"馬"}],"215/65R16":[{"floor":"3樓","pos":"原左二排-右表","zone":"3B","qty":4,"brand":"P5"}],"215/70R16":[{"floor":"3樓","pos":"原左二排-右表","zone":"3B","qty":4,"brand":"SUV+"}],"225/60R16":[{"floor":"3樓","pos":"原左三排-左表","zone":"3B","qty":2,"brand":"PS4UV"}],"235/45R16":[{"floor":"4樓","pos":"原左一排-左表","zone":"3B","qty":2,"brand":"P5"}],"205/55R17":[{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":1,"brand":"P4"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"P5"}],"215/45R17":[{"floor":"4樓","pos":"原左二排-右表","zone":"3C","qty":6,"brand":"P5"},{"floor":"3樓","pos":"原左二排-右表","zone":"3C","qty":4,"brand":"PS5 / P5"}],"215/50R17":[{"floor":"3樓","pos":"原左二排-左表","zone":"3C","qty":2,"brand":"P5"}],"215/55R17":[{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":9,"brand":"P5"},{"floor":"3樓","pos":"原左三排-右表","zone":"3C","qty":6,"brand":"P5"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"PS5"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"馬牌"}],"215/60R17":[{"floor":"3樓","pos":"原左二排-左表","zone":"3C","qty":8,"brand":"BS"},{"floor":"3樓","pos":"原左二排-左表","zone":"3C","qty":7,"brand":"P5"}],"225/45R17":[{"floor":"3樓","pos":"原左二排-右表","zone":"3C","qty":1,"brand":"P4"},{"floor":"4樓","pos":"原左三排","zone":"3C","qty":4,"brand":"P4+"},{"floor":"3樓","pos":"原左二排-左表","zone":"3C","qty":4,"brand":"P5"},{"floor":"3樓","pos":"原左二排-右表","zone":"3C","qty":4,"brand":"P5"},{"floor":"3樓","pos":"原左二排-左表","zone":"3C","qty":1,"brand":"PS4"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"PS5"}],"225/50R17":[{"floor":"3樓","pos":"原左四排-右表","zone":"3C","qty":3,"brand":"P4+"},{"floor":"3樓","pos":"原左二排-右表","zone":"3C","qty":4,"brand":"P5"}],"225/55R17":[{"floor":"4樓","pos":"原走道/貨車區","zone":"3C","qty":5,"brand":"P4+"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":1,"brand":"P4+"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"P5"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":2,"brand":"防爆"}],"225/60R17":[{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":1,"brand":"P4+"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"P5"}],"225/65R17":[{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":2,"brand":"EP"},{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":2,"brand":"EP"},{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":2,"brand":"EP"},{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":2,"brand":"LT"},{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":8,"brand":"P5"},{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":8,"brand":"P5"},{"floor":"4樓","pos":"原左二排-左表","zone":"3C","qty":8,"brand":"SUV+"}],"235/55R17":[{"floor":"4樓","pos":"原左二排-右表","zone":"3C","qty":4,"brand":"P4   3ST"}],"245/45R17":[{"floor":"3樓","pos":"原左二排-右表","zone":"3C","qty":4,"brand":"P4+"},{"floor":"3樓","pos":"原左三排-左表","zone":"3C","qty":4,"brand":"P5"},{"floor":"3樓","pos":"原左四排-右表","zone":"3C","qty":3,"brand":"PS4"}],"215/45R18":[{"floor":"4樓","pos":"原左三排","zone":"3D","qty":4,"brand":"P4+"},{"floor":"3樓","pos":"原左二排-左表","zone":"3D","qty":3,"brand":"P5"},{"floor":"4樓","pos":"原走道/貨車區","zone":"3D","qty":2,"brand":"PS5"}],"215/50R18":[{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":4,"brand":"SUV+"}],"215/55R18":[{"floor":"4樓","pos":"原左二排-右表","zone":"3D","qty":4,"brand":"油電"}],"225/40R18":[{"floor":"3樓","pos":"原左三排-右表","zone":"3D","qty":2,"brand":"P4+"},{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":3,"brand":"PS5"}],"225/45R18":[{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":1,"brand":"P4+"},{"floor":"4樓","pos":"原左二排-右表","zone":"3D","qty":4,"brand":"P4+"},{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":1,"brand":"PS4"},{"floor":"4樓","pos":"原左三排","zone":"3D","qty":4,"brand":"PS5"}],"225/50R18":[{"floor":"3樓","pos":"原左三排-左表","zone":"3D","qty":4,"brand":"P5P"},{"floor":"3樓","pos":"原左三排-左表","zone":"3D","qty":6,"brand":"油電"}],"225/55R18":[{"floor":"3樓","pos":"原左四排-左表","zone":"3D","qty":4,"brand":"PS5"},{"floor":"3樓","pos":"原左二排-右表","zone":"3D","qty":4,"brand":"SUV+"}],"225/60R18":[{"floor":"3樓","pos":"原左三排-右表","zone":"3D","qty":8,"brand":"P5"},{"floor":"3樓","pos":"原左三排-右表","zone":"3D","qty":4,"brand":"P5"},{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":6,"brand":"SUV+"},{"floor":"3樓","pos":"原左三排-右表","zone":"3D","qty":5,"brand":"SUV+"},{"floor":"3樓","pos":"原左三排-右表","zone":"3D","qty":4,"brand":"油電"}],"235/40R18":[{"floor":"4樓","pos":"原左二排-左表","zone":"3D","qty":4,"brand":"P4+"}],"235/45R18":[{"floor":"4樓","pos":"原左二排-右表","zone":"3D","qty":8,"brand":"P5P"},{"floor":"3樓","pos":"原左三排-右表","zone":"3D","qty":4,"brand":"PS5"},{"floor":"4樓","pos":"原左三排","zone":"3D","qty":4,"brand":"油電"}],"235/50R18":[{"floor":"3樓","pos":"原左二排-右表","zone":"3D","qty":5,"brand":"P5"},{"floor":"3樓","pos":"原左二排-右表","zone":"3D","qty":5,"brand":"P5"},{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":4,"brand":"PS5"}],"235/55R18":[{"floor":"3樓","pos":"原左四排-左表","zone":"3D","qty":1,"brand":"LS3"},{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":4,"brand":"P4     E-P"},{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":4,"brand":"P5"},{"floor":"4樓","pos":"原左一排-左表","zone":"3D","qty":4,"brand":"P5"},{"floor":"3樓","pos":"原左四排-左表","zone":"3D","qty":4,"brand":"P5"},{"floor":"4樓","pos":"原左一排-左表","zone":"3D","qty":6,"brand":"P5 / 油電"}],"235/60R18":[{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":4,"brand":"EP"},{"floor":"4樓","pos":"原左三排","zone":"3D","qty":5,"brand":"HP"},{"floor":"4樓","pos":"原左二排-左表","zone":"3D","qty":8,"brand":"P5"},{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":5,"brand":"SUV / EP"},{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":3,"brand":"SUV+"}],"245/40R18":[{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":1,"brand":"PS4"},{"floor":"3樓","pos":"原左四排-左表","zone":"3D","qty":2,"brand":"PS5"},{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":2,"brand":"PS5"}],"245/45R18":[{"floor":"4樓","pos":"原左二排-左表","zone":"3D","qty":3,"brand":"PS5"},{"floor":"4樓","pos":"原左一排-右表","zone":"3D","qty":4,"brand":"防爆"}],"245/50R18":[{"floor":"3樓","pos":"原左四排-左表","zone":"3D","qty":2,"brand":"P4+"},{"floor":"3樓","pos":"原左四排-左表","zone":"3D","qty":4,"brand":"防爆"}],"255/40R18":[{"floor":"3樓","pos":"原左四排-右表","zone":"3D","qty":2,"brand":"P4"}],"225/55R19":[{"floor":"3樓","pos":"原左四排-右表","zone":"4A","qty":1,"brand":"PS4SUV"},{"floor":"3樓","pos":"原左四排-左表","zone":"4A","qty":8,"brand":"SUV+"}],"235/35R19":[{"floor":"4樓","pos":"原左二排-左表","zone":"4A","qty":1,"brand":"PS4S"}],"235/40R19":[{"floor":"3樓","pos":"原左四排-左表","zone":"4A","qty":2,"brand":"PS5"},{"floor":"4樓","pos":"原左三排","zone":"4A","qty":2,"brand":"油電"}],"235/50R19":[{"floor":"4樓","pos":"原左三排","zone":"4A","qty":2,"brand":"P5"},{"floor":"4樓","pos":"原左四排","zone":"4A","qty":1,"brand":"PS4"}],"235/55R19":[{"floor":"4樓","pos":"原左三排","zone":"4A","qty":4,"brand":"HP"},{"floor":"4樓","pos":"原左二排-左表","zone":"4A","qty":4,"brand":"PS4SUV"},{"floor":"3樓","pos":"原左四排-左表","zone":"4A","qty":4,"brand":"PS4UV"}],"245/40R19":[{"floor":"3樓","pos":"原左三排-左表","zone":"4A","qty":4,"brand":"PS4S"},{"floor":"3樓","pos":"原左四排-左表","zone":"4A","qty":2,"brand":"PS5"}],"245/45R19":[{"floor":"3樓","pos":"原左四排-右表","zone":"4A","qty":1,"brand":"倍耐力"},{"floor":"4樓","pos":"原走道/貨車區","zone":"4A","qty":1,"brand":"倍耐力"}],"245/50R19":[{"floor":"3樓","pos":"原左四排-右表","zone":"4A","qty":4,"brand":"P3"}],"255/45R19":[{"floor":"4樓","pos":"原左二排-左表","zone":"4A","qty":4,"brand":"EV"},{"floor":"4樓","pos":"原左二排-左表","zone":"4A","qty":1,"brand":"PS4"},{"floor":"3樓","pos":"原左四排-右表","zone":"4A","qty":4,"brand":"PS5/E"}],"275/35R19":[{"floor":"3樓","pos":"原左四排-右表","zone":"4A","qty":2,"brand":"PS5"}],"235/55R20":[{"floor":"4樓","pos":"原左一排-左表","zone":"4B","qty":8,"brand":"SUV+"}],"275/50R20":[{"floor":"4樓","pos":"原左一排-左表","zone":"4B","qty":2,"brand":"PS4 / SUV"}],"265/45R21":[{"floor":"4樓","pos":"原左一排-左表","zone":"4B","qty":2,"brand":"P5"}],"295/30R22":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4B","qty":2,"brand":"馬"}],"155R13C":[{"floor":"4樓","pos":"原左四排","zone":"4C","qty":11,"brand":"南港"},{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":2,"brand":"南港"}],"165R13C":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":10,"brand":"AG3"},{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":10,"brand":"AG3"},{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":6,"brand":"米"}],"165R14C":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":2,"brand":"南港"},{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":2,"brand":"米"}],"175R14C":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":9,"brand":"南港"}],"185R14C":[{"floor":"4樓","pos":"原左四排","zone":"4C","qty":10,"brand":"AG3"},{"floor":"4樓","pos":"原左四排","zone":"4C","qty":11,"brand":"AG3"}],"195/70R15C":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":5,"brand":"BS"}],"205/65R15C":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4C","qty":6,"brand":"AG3"}],"700R15C":[{"floor":"4樓","pos":"原左四排","zone":"4C","qty":4,"brand":"正新"}],"195/75R16C":[{"floor":"4樓","pos":"原左一排-右表","zone":"4D","qty":7,"brand":"AG3"},{"floor":"4樓","pos":"原左一排-右表","zone":"4D","qty":7,"brand":"AG3"},{"floor":"4樓","pos":"原左一排-右表","zone":"4D","qty":6,"brand":"AG3"},{"floor":"4樓","pos":"原走道/貨車區","zone":"4D","qty":10,"brand":"AG3"},{"floor":"4樓","pos":"原左四排","zone":"4D","qty":7,"brand":"BS"}],"195/85R16C":[{"floor":"4樓","pos":"原左三排","zone":"4D","qty":2,"brand":"米"}],"205/75R16C":[{"floor":"4樓","pos":"原左四排","zone":"4D","qty":1,"brand":"BS"},{"floor":"4樓","pos":"原左四排","zone":"4D","qty":4,"brand":"米"}],"215/70R16C":[{"floor":"4樓","pos":"原走道/貨車區","zone":"4D","qty":4,"brand":"AG3"}],"700R16C":[{"floor":"4樓","pos":"原左四排","zone":"4D","qty":4,"brand":"正新"}],"225/55R17C":[{"floor":"4樓","pos":"原左四排","zone":"4D","qty":4,"brand":"AG3"}],"225/75R17.5":[{"floor":"4樓","pos":"原左三排","zone":"4D","qty":2,"brand":"米"}]}
-;
-
-
 const BASE_TX_LOG = [];
 
 const BASE_DATA = [
@@ -1205,6 +1297,7 @@ function goPage(id) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelector(`.nav-item[onclick="goPage('${id}')"]`).classList.add('active');
+  closeSidebar();
   const [title, sub] = PAGE_TITLES[id];
   document.getElementById('page-title').textContent = title;
   document.getElementById('page-sub').textContent = sub;
@@ -1357,15 +1450,20 @@ function showResultCard(t) {
   badge.textContent = t.status;
   badge.className = 'result-badge ' + (t.status==='正常'?'badge-ok':t.status==='低庫存'?'badge-low':'badge-warn');
 
-  // Parse locations using LOC_DATA (brand-aware)
-  const locItems = LOC_DATA[t.spec] || [];
-  const locHtml = locItems.length ? locItems.map(l => {
+  // Parse locations
+  const locs = t.loc ? t.loc.split(' / ') : [];
+  const locHtml = locs.length ? locs.map(l => {
+    const parts = l.split(' → ');
+    const place = parts[0]||l;
+    const detail = parts[1]||'';
+    const countMatch = detail.match(/：(\d+)條/);
+    const count = countMatch ? countMatch[1] : '';
     return `<div class="location-item">
       <div class="loc-info">
-        <div class="loc-name">${l.floor} ${l.pos} <span style="color:var(--text-muted);font-size:12px">→ ${l.zone}：${l.qty}條</span></div>
-        <div class="loc-detail" style="color:var(--accent);font-weight:600">${l.brand}</div>
+        <div class="loc-name">${place}</div>
+        ${detail ? `<div class="loc-detail">${detail}</div>` : ''}
       </div>
-      <div class="loc-count">${l.qty}</div>
+      ${count ? `<div class="loc-count">${count}</div>` : ''}
     </div>`;
   }).join('') : '<div style="color:var(--text-muted);font-size:13px;padding:8px">無位置資料</div>';
 
@@ -1431,12 +1529,6 @@ function addInventory() {
     id: Date.now(), type: '進貨', spec: normSpec, brand, qty, price,
     date: dateDisp, datetime: nowStr(), note: note||''
   });
-
-  // Update LOC_DATA
-  if (!LOC_DATA[normSpec]) LOC_DATA[normSpec] = [];
-  if (location) {
-    LOC_DATA[normSpec].push({ floor, pos: location, zone, qty, brand });
-  }
 
   addedItems.unshift({spec: normSpec, brand, qty, dot, price, zone, location: location||'—', date: dateDisp});
   saveInventory();
@@ -1526,10 +1618,6 @@ function openZoneDetail(zone) {
     const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
       ? `$${t.priceMin.toLocaleString()}`
       : (t.priceMin||t.priceMax ? `$${(t.priceMin||0).toLocaleString()}~${(t.priceMax||0).toLocaleString()}` : '—');
-    const locItems = LOC_DATA[t.spec] || [];
-    const locStr = locItems.length
-      ? locItems.map(l => `${l.floor} ${l.pos} → ${l.zone}：${l.qty}條（${l.brand}）`).join(' / ')
-      : (t.loc||'—');
     return `<tr>
       <td><span class="spec-mono">${t.spec}</span></td>
       <td style="color:var(--text-secondary)">${t.brand}</td>
@@ -1537,7 +1625,7 @@ function openZoneDetail(zone) {
       <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${t.dot||'—'}</td>
       <td class="price-range">${priceStr}</td>
       <td><span class="pill ${pillClass(t.status)}">${t.status}</span></td>
-      <td style="color:var(--text-muted);font-size:11px;max-width:320px">${locStr}</td>
+      <td style="color:var(--text-muted);font-size:11px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.loc||'—'}</td>
     </tr>`;
   }).join('');
 
@@ -1878,7 +1966,6 @@ async function syncToGitHub() {
     const currentHtml = await fetch(location.href).then(r => r.text());
     const newInventoryJSON = JSON.stringify(inventory, null, 2);
     const newTxLogJSON = JSON.stringify(txLog, null, 2);
-    const newLocJSON = JSON.stringify(LOC_DATA);
     let newHtml = currentHtml.replace(
       /const BASE_DATA = \[[\s\S]*?\];/,
       `const BASE_DATA = ${newInventoryJSON};`
@@ -1886,10 +1973,6 @@ async function syncToGitHub() {
     newHtml = newHtml.replace(
       /const BASE_TX_LOG = \[[\s\S]*?\];/,
       `const BASE_TX_LOG = ${newTxLogJSON};`
-    );
-    newHtml = newHtml.replace(
-      /const LOC_DATA = \{[\s\S]*?\};/,
-      `const LOC_DATA = ${newLocJSON};`
     );
 
     // 3. Push to GitHub
@@ -1932,6 +2015,18 @@ function showToast(msg) {
   document.getElementById('toast-msg').textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Mobile Sidebar ──
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
 // ── Init ──
