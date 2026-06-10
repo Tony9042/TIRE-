@@ -487,6 +487,11 @@
         <span class="icon">⚠️</span> 低庫存警示
         <span id="alertBadge" style="margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:1px 7px;border-radius:20px;font-weight:700;"></span>
       </div>
+
+      <div class="nav-section-label">管理員</div>
+      <div class="nav-item" onclick="goPage('sync')">
+        <span class="icon">☁️</span> 同步到 GitHub
+      </div>
     </div>
     <div class="sidebar-footer">
       <div class="stat-row"><span>總輪胎數</span><span id="sb-total">—</span></div>
@@ -784,8 +789,56 @@
         </div>
       </div>
 
-      <!-- ═══ ALERTS PAGE ═══ -->
-      <div class="page" id="page-alerts">
+      <!-- ═══ SYNC PAGE ═══ -->
+      <div class="page" id="page-sync">
+        <div class="form-section" style="max-width:560px">
+          <h2>☁️ 同步到 GitHub</h2>
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;line-height:1.7">
+            每次在「新增庫存」頁面新增或修改後，按下方按鈕即可將最新庫存資料推送到 GitHub，所有人的網頁會在約 1 分鐘內自動更新。
+          </p>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label>GitHub Personal Access Token</label>
+            <div style="display:flex;gap:8px">
+              <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxx" class="input-wide" style="font-family:'JetBrains Mono',monospace;font-size:12px">
+              <button class="btn btn-ghost btn-sm" onclick="toggleTokenView()">👁</button>
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:5px">Token 只存在你的瀏覽器本機，不會上傳或分享。</div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="syncToGitHub()" id="sync-btn">
+              ☁️ 立即同步到 GitHub
+            </button>
+            <button class="btn btn-ghost btn-sm" onclick="saveToken()">💾 記住 Token</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearToken()">🗑 清除 Token</button>
+          </div>
+
+          <div id="sync-status" style="margin-top:20px;display:none">
+            <div style="background:var(--dark);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-size:13px" id="sync-status-inner"></div>
+          </div>
+        </div>
+
+        <div class="form-section" style="max-width:560px">
+          <h2 style="margin-bottom:12px">使用說明</h2>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="background:var(--accent);color:var(--black);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">1</span>
+              <span style="color:var(--text-secondary);font-size:13px">在「新增庫存」頁面完成所有新增或修改</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="background:var(--accent);color:var(--black);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">2</span>
+              <span style="color:var(--text-secondary);font-size:13px">回到這個頁面，輸入 Token 後按「立即同步」</span>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="background:var(--accent);color:var(--black);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">3</span>
+              <span style="color:var(--text-secondary);font-size:13px">約 1 分鐘後，所有人的網頁自動顯示最新庫存</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ALERTS PAGE ═══ -->      <div class="page" id="page-alerts">
         <div class="stat-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
           <div class="stat-card red">
             <div class="label">低庫存（≤2條）</div>
@@ -938,6 +991,7 @@ const PAGE_TITLES = {
   zones: ['倉位庫存','點選倉位查看詳細品項'],
   all: ['全部品項','所有庫存一覽'],
   alerts: ['低庫存警示','需注意或補貨的規格'],
+  sync: ['同步到 GitHub','將目前庫存資料推送更新至網頁'],
 };
 
 function goPage(id) {
@@ -1336,6 +1390,106 @@ function renderAlerts() {
   }).join('') : '<div class="empty-state"><div class="icon">✅</div><div class="msg">目前無低庫存警示</div></div>';
 }
 
+// ── GitHub Sync ──
+const GH_USER = 'Tony9042';
+const GH_REPO = 'TIRE-';
+const GH_FILE = 'index.html';
+const GH_API  = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`;
+const TOKEN_KEY = 'tongyu_gh_token';
+
+function toggleTokenView() {
+  const inp = document.getElementById('gh-token');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+function saveToken() {
+  const t = document.getElementById('gh-token').value.trim();
+  if (!t) { showToast('⚠️ 請先輸入 Token'); return; }
+  localStorage.setItem(TOKEN_KEY, t);
+  showToast('✅ Token 已儲存到瀏覽器');
+}
+function clearToken() {
+  localStorage.removeItem(TOKEN_KEY);
+  document.getElementById('gh-token').value = '';
+  showToast('🗑 Token 已清除');
+}
+function loadSavedToken() {
+  const t = localStorage.getItem(TOKEN_KEY);
+  if (t) document.getElementById('gh-token').value = t;
+}
+
+function setSyncStatus(msg, color) {
+  const el = document.getElementById('sync-status');
+  const inner = document.getElementById('sync-status-inner');
+  el.style.display = 'block';
+  inner.style.color = color || 'var(--text-secondary)';
+  inner.innerHTML = msg;
+}
+
+async function syncToGitHub() {
+  const token = document.getElementById('gh-token').value.trim();
+  if (!token) { showToast('⚠️ 請輸入 GitHub Token'); return; }
+
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ 同步中…';
+  setSyncStatus('📡 正在讀取目前 GitHub 檔案…', 'var(--text-muted)');
+
+  try {
+    // 1. Get current file SHA
+    const getRes = await fetch(GH_API, {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if (!getRes.ok) {
+      const err = await getRes.json();
+      throw new Error('讀取失敗：' + (err.message || getRes.status));
+    }
+    const fileData = await getRes.json();
+    const sha = fileData.sha;
+
+    setSyncStatus('🔧 正在產生最新庫存 HTML…', 'var(--text-muted)');
+
+    // 2. Build new HTML with current inventory embedded
+    const currentHtml = await fetch(location.href).then(r => r.text());
+    const newInventoryJSON = JSON.stringify(inventory, null, 2);
+    const newHtml = currentHtml.replace(
+      /const BASE_DATA = \[[\s\S]*?\];/,
+      `const BASE_DATA = ${newInventoryJSON};`
+    );
+
+    // 3. Push to GitHub
+    setSyncStatus('☁️ 正在推送到 GitHub…', 'var(--text-muted)');
+    const encoded = btoa(unescape(encodeURIComponent(newHtml)));
+    const putRes = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `庫存更新 ${new Date().toLocaleString('zh-TW')}`,
+        content: encoded,
+        sha: sha
+      })
+    });
+
+    if (!putRes.ok) {
+      const err = await putRes.json();
+      throw new Error('推送失敗：' + (err.message || putRes.status));
+    }
+
+    setSyncStatus('✅ 同步成功！約 1 分鐘後網頁會自動更新。', 'var(--green)');
+    showToast('✅ 已成功同步到 GitHub！');
+
+  } catch(e) {
+    setSyncStatus('❌ ' + e.message, 'var(--red)');
+    showToast('❌ 同步失敗，請檢查 Token');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '☁️ 立即同步到 GitHub';
+  }
+}
+
 // ── Toast ──
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1346,6 +1500,7 @@ function showToast(msg) {
 
 // ── Init ──
 renderOverview();
+loadSavedToken();
 </script>
 </body>
 </html>
