@@ -1182,9 +1182,32 @@
 // ══════════════════════════════════════
 // DATA
 // ══════════════════════════════════════
-const INVENTORY_KEY = 'tongyu_inventory_v7';
+const INVENTORY_KEY = 'tongyu_inventory_v8';
 
-const BASE_TX_LOG = [];
+const BASE_TX_LOG = [
+  {
+    "id": 1781511188665,
+    "type": "進貨",
+    "spec": "215/55R17",
+    "brand": "PC7",
+    "qty": 4,
+    "price": 4000,
+    "date": "2026/06/15",
+    "datetime": "2026/06/15 16:13",
+    "note": ""
+  },
+  {
+    "id": 1781507682314,
+    "type": "出貨",
+    "spec": "215/60R17",
+    "brand": "ALENZA / P5",
+    "qty": 4,
+    "price": 4000,
+    "date": "2026/06/15",
+    "datetime": "2026/06/15 15:14",
+    "note": "環湖路 林先生"
+  }
+];
 
 const BASE_DATA = [
   {
@@ -2022,7 +2045,7 @@ const BASE_DATA = [
     "spec": "215/60R17",
     "inch": "17吋",
     "zone": "3C",
-    "qty": 15,
+    "qty": 11,
     "brand": "ALENZA / P5",
     "dot": "2425 / 3125",
     "priceMin": 4000,
@@ -2035,7 +2058,7 @@ const BASE_DATA = [
         "mfr": "普利司通",
         "model": "ALENZA",
         "dot": "2425",
-        "qty": 8,
+        "qty": 4,
         "price": 4000,
         "origin": ""
       },
@@ -2366,7 +2389,7 @@ const BASE_DATA = [
     "spec": "225/55R18",
     "inch": "18吋",
     "zone": "3D",
-    "qty": 10,
+    "qty": 6,
     "brand": "UC7 / SUV+",
     "dot": "4924 / 4124",
     "priceMin": 4800,
@@ -2379,7 +2402,7 @@ const BASE_DATA = [
         "mfr": "馬牌",
         "model": "UC7",
         "dot": "4924",
-        "qty": 6,
+        "qty": 2,
         "price": 5000,
         "origin": ""
       },
@@ -2397,9 +2420,9 @@ const BASE_DATA = [
     "spec": "215/55R17",
     "inch": "17吋",
     "zone": "3C",
-    "qty": 19,
-    "brand": "P5 / PS5",
-    "dot": "0126 / 4223",
+    "qty": 23,
+    "brand": "P5 / PS5 / PC7",
+    "dot": "0126 / 4223 / 2025",
     "priceMin": 3500,
     "priceMax": 4300,
     "origin": "",
@@ -2428,6 +2451,14 @@ const BASE_DATA = [
         "dot": "0126",
         "qty": 5,
         "price": 4300,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "PC7",
+        "dot": "2025",
+        "qty": 4,
+        "price": 4000,
         "origin": ""
       }
     ]
@@ -3746,7 +3777,7 @@ let txLog = loadTxLog();      // transaction log: [{id, type, spec, brand, qty, 
 let addedItems = [];
 let shippedItems = [];
 
-const TX_LOG_KEY = 'tongyu_txlog_v1';
+const TX_LOG_KEY = 'tongyu_txlog_v2';
 
 function loadInventory() {
   try {
