@@ -658,6 +658,9 @@
       </div>
 
       <div class="nav-section-label">管理員</div>
+      <div class="nav-item" onclick="loadLatestFromGitHub()">
+        <span class="icon">🔄</span> 載入 GitHub 最新版
+      </div>
       <div class="nav-item" onclick="goPage('sync')">
         <span class="icon">☁️</span> 同步到 GitHub
       </div>
@@ -1058,9 +1061,19 @@
       <div class="page" id="page-sync">
         <div class="form-section" style="max-width:560px">
           <h2>☁️ 同步到 GitHub</h2>
-          <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;line-height:1.7">
+          <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;line-height:1.7">
             每次在「新增庫存」頁面新增或修改後，按下方按鈕即可將最新庫存資料推送到 GitHub，所有人的網頁會在約 1 分鐘內自動更新。
           </p>
+
+          <div style="background:var(--blue-bg);border:1px solid var(--blue);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px">
+            <div style="font-size:13px;color:var(--text-primary);margin-bottom:10px;line-height:1.6">
+              <strong style="color:var(--blue)">⚠️ 編輯前建議先按這顆</strong><br>
+              先載入線上最新資料，避免推到舊版把別人的更新蓋掉。
+            </div>
+            <button class="btn" style="background:var(--blue);color:#fff" onclick="loadLatestFromGitHub()">
+              🔄 載入 GitHub 最新版
+            </button>
+          </div>
 
           <div class="form-group" style="margin-bottom:16px">
             <label>GitHub Personal Access Token</label>
@@ -2030,6 +2043,43 @@ const GH_REPO = 'TIRE-';
 const GH_FILE = 'index.html';
 const GH_API  = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${GH_FILE}`;
 const TOKEN_KEY = 'tongyu_gh_token';
+
+// 從 GitHub 重新載入最新庫存，覆蓋本機快取（避免同步時推到舊資料）
+async function loadLatestFromGitHub() {
+  if (!confirm('將從 GitHub 載入最新庫存資料，並覆蓋目前畫面。\n（本機尚未同步的變更會遺失）\n\n確定要載入嗎？')) return;
+  showToast('🔄 正在從 GitHub 載入最新資料…');
+  try {
+    // 抓線上實際部署的網頁（同源，加時間戳避免快取）
+    const url = location.pathname.replace(/[^/]*$/, '') + 'index.html?cb=' + Date.now();
+    const html = await fetch(url, { cache: 'no-store' }).then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    });
+    const mInv = html.match(/const BASE_DATA = (\[[\s\S]*?\]);/);
+    if (!mInv) throw new Error('讀不到庫存資料');
+    const mTx = html.match(/const BASE_TX_LOG = (\[[\s\S]*?\]);/);
+    const newInv = (new Function('return (' + mInv[1] + ')'))();
+    const newTx  = mTx ? (new Function('return (' + mTx[1] + ')'))() : [];
+    if (!Array.isArray(newInv) || !newInv.length) throw new Error('資料格式不正確');
+    inventory = newInv;
+    txLog = newTx;
+    saveInventory();
+    saveTxLog();
+    renderOverview();
+    // 若目前在某個列表頁，順手重繪
+    const active = document.querySelector('.page.active');
+    if (active) {
+      const id = active.id.replace('page-','');
+      if (id === 'all') filterAll();
+      if (id === 'zones') renderZones();
+      if (id === 'alerts') renderAlerts();
+      if (id === 'log') renderLog();
+    }
+    showToast(`✅ 已載入 GitHub 最新版（${inventory.length} 個品項）`);
+  } catch(e) {
+    showToast('❌ 載入失敗：' + e.message);
+  }
+}
 
 function toggleTokenView() {
   const inp = document.getElementById('gh-token');
