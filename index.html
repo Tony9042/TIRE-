@@ -1188,88 +1188,2546 @@ const INVENTORY_KEY = 'tongyu_inventory_v6';
 const BASE_TX_LOG = [];
 
 const BASE_DATA = [
-  {spec:"175/65R14",inch:"14吋",zone:"3A",qty:6,brand:"SA4",dot:"0226",priceMin:2600,priceMax:2600,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0226",qty:6,price:2600,origin:""}]},
-  {spec:"185/60R14",inch:"14吋",zone:"3A",qty:9,brand:"XM2",dot:"2025 / 0926 / 1624",priceMin:2700,priceMax:2700,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"XM2",dot:"2025",qty:4,price:2700,origin:""},{mfr:"米其林",model:"XM2",dot:"0926",qty:4,price:2700,origin:""},{mfr:"米其林",model:"XM2",dot:"1624",qty:1,price:2700,origin:""}]},
-  {spec:"185/65R14",inch:"14吋",zone:"3A",qty:5,brand:"SA4",dot:"5125 / 3523",priceMin:2700,priceMax:2700,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"5125",qty:4,price:2700,origin:""},{mfr:"米其林",model:"SA4",dot:"3523",qty:1,price:2700,origin:""}]},
-  {spec:"185/55R15",inch:"15吋",zone:"3A",qty:7,brand:"PS3",dot:"2124",priceMin:3200,priceMax:3200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS3",dot:"2124",qty:7,price:3200,origin:""}]},
-  {spec:"195/55R15",inch:"15吋",zone:"3A",qty:4,brand:"SA4",dot:"4825",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"4825",qty:4,price:3200,origin:""}]},
-  {spec:"205/65R15",inch:"15吋",zone:"3A",qty:3,brand:"SA4",dot:"0826",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0826",qty:3,price:3200,origin:""}]},
-  {spec:"205/70R15",inch:"15吋",zone:"3A",qty:10,brand:"SUV+ / SP-9",dot:"0625 / 3525",priceMin:2900,priceMax:3800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"0625",qty:6,price:3800,origin:""},{mfr:"南港",model:"SP-9",dot:"3525",qty:4,price:2900,origin:""}]},
-  {spec:"205/60R16",inch:"16吋",zone:"3B",qty:15,brand:"P5 / P4+ / XM2",dot:"4925 / 2823 / 3025 / 2023",priceMin:3000,priceMax:3800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4925",qty:8,price:3800,origin:""},{mfr:"米其林",model:"P4+",dot:"2823",qty:3,price:3000,origin:""},{mfr:"米其林",model:"XM2",dot:"3025",qty:3,price:3600,origin:""},{mfr:"米其林",model:"XM2",dot:"2023",qty:1,price:3600,origin:""}]},
-  {spec:"195/50R15",inch:"15吋",zone:"3A",qty:2,brand:"P4+",dot:"0322*2",priceMin:2000,priceMax:2000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"0322*2",qty:2,price:2000,origin:""}]},
-  {spec:"195/55R16",inch:"16吋",zone:"3B",qty:14,brand:"P4+ / TURANZA6 / P3 / P5",dot:"1520 / 1525 / 4922 / 3225",priceMin:2000,priceMax:4000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"1520",qty:2,price:2000,origin:""},{mfr:"普利司通",model:"TURANZA6",dot:"1525",qty:4,price:3500,origin:""},{mfr:"米其林",model:"P3",dot:"4922",qty:4,price:3000,origin:""},{mfr:"米其林",model:"P5",dot:"3225",qty:4,price:4000,origin:""}]},
-  {spec:"185/55R16",inch:"16吋",zone:"3B",qty:6,brand:"SA4 / NH-100",dot:"0626 / 3625 / 4225",priceMin:2300,priceMax:3800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0626",qty:3,price:3800,origin:""},{mfr:"米其林",model:"SA4",dot:"3625",qty:1,price:3800,origin:""},{mfr:"普利司通",model:"NH-100",dot:"4225",qty:2,price:2300,origin:""}]},
-  {spec:"195/65R15",inch:"15吋",zone:"3A",qty:20,brand:"SX-608 / P4 / SA4",dot:"4225 / 4025 / 3025",priceMin:2500,priceMax:3200,origin:"",status:"正常",truck:"否",batches:[{mfr:"南港",model:"SX-608",dot:"4225",qty:4,price:2500,origin:""},{mfr:"米其林",model:"P4",dot:"4025",qty:6,price:3200,origin:""},{mfr:"米其林",model:"SA4",dot:"3025",qty:10,price:3200,origin:""}]},
-  {spec:"195/50R16",inch:"16吋",zone:"3B",qty:2,brand:"ER-33",dot:"4225",priceMin:3200,priceMax:3200,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"普利司通",model:"ER-33",dot:"4225",qty:2,price:3200,origin:""}]},
-  {spec:"185/60R15",inch:"15吋",zone:"3A",qty:12,brand:"P4 / XM2",dot:"2025 / 2024 / 2023 / 2624",priceMin:3000,priceMax:3000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"2025",qty:1,price:3000,origin:""},{mfr:"米其林",model:"P4",dot:"2024",qty:2,price:3000,origin:""},{mfr:"米其林",model:"P4",dot:"2023",qty:1,price:3000,origin:""},{mfr:"米其林",model:"XM2",dot:"2624",qty:8,price:3000,origin:""}]},
-  {spec:"185/65R15",inch:"15吋",zone:"3A",qty:18,brand:"P4 / SA4",dot:"3425 / 1124",priceMin:3000,priceMax:3000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"3425",qty:8,price:3000,origin:""},{mfr:"米其林",model:"SA4",dot:"1124",qty:10,price:3000,origin:""}]},
-  {spec:"195/60R16",inch:"16吋",zone:"3B",qty:2,brand:"P4+",dot:"2024",priceMin:3400,priceMax:3400,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"2024",qty:2,price:3400,origin:""}]},
-  {spec:"215/65R16",inch:"16吋",zone:"3B",qty:4,brand:"P5",dot:"3425",priceMin:4300,priceMax:4300,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"3425",qty:4,price:4300,origin:""}]},
-  {spec:"215/70R16",inch:"16吋",zone:"3B",qty:4,brand:"SUV+",dot:"3025",priceMin:4300,priceMax:4300,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"3025",qty:4,price:4300,origin:""}]},
-  {spec:"205/55R16",inch:"16吋",zone:"3B",qty:16,brand:"SA4 / P5",dot:"0426 / 1326",priceMin:3600,priceMax:3600,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0426",qty:8,price:3600,origin:""},{mfr:"米其林",model:"P5",dot:"1326",qty:8,price:3600,origin:""}]},
-  {spec:"215/60R16",inch:"16吋",zone:"3B",qty:18,brand:"P4+ / P4 / UC7",dot:"3824 / 1123 / 2624",priceMin:3000,priceMax:3500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"3824",qty:13,price:3500,origin:""},{mfr:"米其林",model:"P4",dot:"1123",qty:1,price:3000,origin:""},{mfr:"馬牌",model:"UC7",dot:"2624",qty:4,price:3500,origin:""}]},
-  {spec:"225/45R17",inch:"17吋",zone:"3C",qty:19,brand:"P5 / PS4 / P4+ / PS5",dot:"4825 / 3421 / 4324 / 2624",priceMin:1000,priceMax:4300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4825",qty:4,price:4300,origin:""},{mfr:"米其林",model:"P5",dot:"4825",qty:6,price:4300,origin:""},{mfr:"米其林",model:"PS4",dot:"3421",qty:1,price:1000,origin:""},{mfr:"米其林",model:"P4+",dot:"4324",qty:4,price:4200,origin:""},{mfr:"米其林",model:"PS5",dot:"2624",qty:4,price:4000,origin:""}]},
-  {spec:"235/55R17",inch:"17吋",zone:"3C",qty:9,brand:"P3 / P4+",dot:"2917 / 2523",priceMin:3000,priceMax:3000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P3",dot:"2917",qty:4,price:0,origin:""},{mfr:"米其林",model:"P4+",dot:"2523",qty:5,price:3000,origin:""}]},
-  {spec:"235/60R18",inch:"18吋",zone:"3D",qty:21,brand:"HP / SUV+ / EP / P5 / SUV",dot:"3824 / 4725 / 1721 / 4125 / 0926 / 4121",priceMin:1000,priceMax:5300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"HP",dot:"3824",qty:5,price:5200,origin:""},{mfr:"",model:"SUV+",dot:"4725",qty:3,price:5300,origin:""},{mfr:"",model:"EP",dot:"1721",qty:2,price:1000,origin:""},{mfr:"",model:"EP",dot:"4125",qty:4,price:5300,origin:""},{mfr:"",model:"P5",dot:"0926",qty:6,price:5300,origin:""},{mfr:"",model:"SUV",dot:"4121",qty:1,price:1000,origin:""}]},
-  {spec:"215/55R18",inch:"18吋",zone:"3D",qty:4,brand:"EP",dot:"3923",priceMin:4000,priceMax:4000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"EP",dot:"3923",qty:4,price:4000,origin:""}]},
-  {spec:"215/45R18",inch:"18吋",zone:"3D",qty:8,brand:"P4+ / PS5",dot:"2523 / 3523",priceMin:4000,priceMax:4000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"2523",qty:4,price:4000,origin:""},{mfr:"米其林",model:"PS5",dot:"3523",qty:4,price:4000,origin:""}]},
-  {spec:"215/60R17",inch:"17吋",zone:"3C",qty:15,brand:"ALENZA / P5",dot:"2425 / 3125",priceMin:4000,priceMax:4000,origin:"",status:"正常",truck:"否",batches:[{mfr:"普利司通",model:"ALENZA",dot:"2425",qty:8,price:4000,origin:""},{mfr:"米其林",model:"P5",dot:"3125",qty:7,price:4000,origin:""}]},
-  {spec:"215/45R17",inch:"17吋",zone:"3C",qty:9,brand:"P5 / PS5",dot:"5225 / 1425",priceMin:4200,priceMax:4200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"5225",qty:6,price:4200,origin:""},{mfr:"米其林",model:"PS5",dot:"1425",qty:3,price:4200,origin:""}]},
-  {spec:"245/45R17",inch:"17吋",zone:"3C",qty:11,brand:"P4+ / 防爆 / P4 / P5 / PS4",dot:"5123 / 4821 / 2125 / 2024",priceMin:2000,priceMax:5500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"5123",qty:2,price:3000,origin:""},{mfr:"米其林",model:"防爆",dot:"",qty:1,price:3000,origin:""},{mfr:"米其林",model:"P4",dot:"4821",qty:1,price:2000,origin:""},{mfr:"米其林",model:"P5",dot:"2125",qty:4,price:5500,origin:""},{mfr:"米其林",model:"PS4",dot:"2024",qty:3,price:2500,origin:""}]},
-  {spec:"205/55R17",inch:"17吋",zone:"3C",qty:4,brand:"P5",dot:"3525",priceMin:4500,priceMax:4500,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"3525",qty:4,price:4500,origin:""}]},
-  {spec:"225/50R17",inch:"17吋",zone:"3C",qty:3,brand:"P4 / P4+",dot:"3423 / 2023",priceMin:3000,priceMax:3000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"3423",qty:1,price:3000,origin:""},{mfr:"米其林",model:"P4+",dot:"2023",qty:2,price:3000,origin:""}]},
-  {spec:"225/60R17",inch:"17吋",zone:"3C",qty:9,brand:"P5 / P4+",dot:"4125 / 3525 / 3124",priceMin:4300,priceMax:5200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4125",qty:4,price:5200,origin:""},{mfr:"米其林",model:"P5",dot:"3525",qty:4,price:4300,origin:""},{mfr:"米其林",model:"P4+",dot:"3124",qty:1,price:4300,origin:""}]},
-  {spec:"225/65R17",inch:"17吋",zone:"3C",qty:31,brand:"P5 / EP / HP / SUV+ / SUV / PS4 SUV",dot:"0526 / 4423 / 2024 / 2023 / 3821 / 2925 / 5023 / 2623",priceMin:1000,priceMax:4500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"0526",qty:17,price:4500,origin:""},{mfr:"米其林",model:"P5",dot:"4423",qty:2,price:4500,origin:""},{mfr:"米其林",model:"EP",dot:"2024",qty:2,price:4500,origin:""},{mfr:"米其林",model:"EP",dot:"2023",qty:3,price:4500,origin:""},{mfr:"米其林",model:"HP",dot:"3821",qty:2,price:1000,origin:""},{mfr:"米其林",model:"SUV+",dot:"2925",qty:2,price:4500,origin:""},{mfr:"米其林",model:"EP",dot:"5023",qty:1,price:4000,origin:""},{mfr:"米其林",model:"SUV",dot:"",qty:1,price:4000,origin:""},{mfr:"米其林",model:"PS4 SUV",dot:"2623",qty:1,price:4000,origin:""}]},
-  {spec:"235/45R18",inch:"18吋",zone:"3D",qty:16,brand:"EP / P5E / PS5",dot:"4724 / 1026 / 1125",priceMin:4500,priceMax:6200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"EP",dot:"4724",qty:4,price:4500,origin:""},{mfr:"米其林",model:"P5E",dot:"1026",qty:4,price:4500,origin:""},{mfr:"米其林",model:"P5E",dot:"1026",qty:4,price:4500,origin:""},{mfr:"米其林",model:"PS5",dot:"1125",qty:4,price:6200,origin:""}]},
-  {spec:"225/55R18",inch:"18吋",zone:"3D",qty:10,brand:"UC7 / SUV+",dot:"4924 / 4124",priceMin:4800,priceMax:5000,origin:"",status:"正常",truck:"否",batches:[{mfr:"馬牌",model:"UC7",dot:"4924",qty:6,price:5000,origin:""},{mfr:"",model:"SUV+",dot:"4124",qty:4,price:4800,origin:""}]},
-  {spec:"215/55R17",inch:"17吋",zone:"3C",qty:19,brand:"P5 / PS5",dot:"0126 / 4223",priceMin:3500,priceMax:4300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"0126",qty:10,price:4300,origin:""},{mfr:"米其林",model:"PS5",dot:"4223",qty:4,price:3500,origin:""},{mfr:"米其林",model:"P5",dot:"0126",qty:5,price:4300,origin:""}]},
-  {spec:"225/55R17",inch:"17吋",zone:"3C",qty:7,brand:"P3 / P5 / P4+",dot:"2125 / 2024",priceMin:5000,priceMax:5300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P3",dot:"2125",qty:2,price:5300,origin:""},{mfr:"米其林",model:"P5",dot:"2125",qty:4,price:5300,origin:""},{mfr:"米其林",model:"P4+",dot:"2024",qty:1,price:5000,origin:""}]},
-  {spec:"225/45R18",inch:"18吋",zone:"3D",qty:14,brand:"P5 / PS5 / PS4",dot:"4924 / 3724",priceMin:5000,priceMax:5300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4924",qty:5,price:5000,origin:""},{mfr:"米其林",model:"PS5",dot:"3724",qty:8,price:5200,origin:""},{mfr:"米其林",model:"PS4",dot:"",qty:1,price:5300,origin:""}]},
-  {spec:"245/40R18",inch:"18吋",zone:"3D",qty:5,brand:"PS5 / PS4",dot:"3424 / 1721",priceMin:2000,priceMax:6500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"3424",qty:4,price:6500,origin:""},{mfr:"",model:"PS4",dot:"1721",qty:1,price:2000,origin:""}]},
-  {spec:"245/50R18",inch:"18吋",zone:"3D",qty:6,brand:"P4 / 防爆",dot:"4224 / 3525",priceMin:8300,priceMax:9500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"4224",qty:2,price:8300,origin:""},{mfr:"米其林",model:"防爆",dot:"3525",qty:4,price:9500,origin:""}]},
-  {spec:"225/40R18",inch:"18吋",zone:"3D",qty:5,brand:"P4+ / PS5",dot:"2023 / 4024",priceMin:4000,priceMax:4500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"2023",qty:2,price:4500,origin:""},{mfr:"米其林",model:"PS5",dot:"4024",qty:3,price:4000,origin:""}]},
-  {spec:"245/45R18",inch:"18吋",zone:"3D",qty:4,brand:"防爆",dot:"1922",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"防爆",dot:"1922",qty:4,price:5000,origin:""}]},
-  {spec:"235/55R18",inch:"18吋",zone:"3D",qty:22,brand:"EP / P5",dot:"4625 / 4725 / 4123",priceMin:5000,priceMax:5000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"EP",dot:"4625",qty:1,price:5000,origin:""},{mfr:"米其林",model:"P5",dot:"4625",qty:9,price:5000,origin:""},{mfr:"",model:"P5",dot:"4725",qty:8,price:5000,origin:""},{mfr:"",model:"EP",dot:"4123",qty:4,price:5000,origin:""}]},
-  {spec:"235/50R18",inch:"18吋",zone:"3D",qty:14,brand:"P5",dot:"1025",priceMin:5800,priceMax:5800,origin:"",status:"正常",truck:"否",batches:[{mfr:"",model:"P5",dot:"1025",qty:6,price:5800,origin:""},{mfr:"",model:"P5",dot:"1025",qty:8,price:5800,origin:""}]},
-  {spec:"225/60R18",inch:"18吋",zone:"3D",qty:29,brand:"P5 / EP / PS4 SUV / SUV+",dot:"0926 / 3925 / 4819 / 4525",priceMin:5200,priceMax:5200,origin:"",status:"正常",truck:"否",batches:[{mfr:"",model:"P5",dot:"0926",qty:12,price:5200,origin:""},{mfr:"",model:"EP",dot:"3925",qty:4,price:5200,origin:""},{mfr:"",model:"PS4 SUV",dot:"4819",qty:2,price:5200,origin:""},{mfr:"",model:"SUV+",dot:"4525",qty:11,price:5200,origin:""}]},
-  {spec:"225/50R18",inch:"18吋",zone:"3D",qty:10,brand:"P5E / EP",dot:"0526 / 5125",priceMin:5200,priceMax:5200,origin:"",status:"正常",truck:"否",batches:[{mfr:"",model:"P5E",dot:"0526",qty:4,price:5200,origin:""},{mfr:"",model:"EP",dot:"5125",qty:6,price:5200,origin:""}]},
-  {spec:"215/50R18",inch:"18吋",zone:"3D",qty:4,brand:"SUV+",dot:"2625",priceMin:5400,priceMax:5400,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"",model:"SUV+",dot:"2625",qty:4,price:5400,origin:""}]},
-  {spec:"235/40R18",inch:"18吋",zone:"3D",qty:4,brand:"P4+",dot:"2825",priceMin:6500,priceMax:6500,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"",model:"P4+",dot:"2825",qty:4,price:6500,origin:""}]},
-  {spec:"225/55R19",inch:"19吋",zone:"4A",qty:9,brand:"SUV+ / PS4",dot:"0126 / 2921",priceMin:3000,priceMax:7200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"0126",qty:8,price:7200,origin:""},{mfr:"米其林",model:"PS4",dot:"2921",qty:1,price:3000,origin:""}]},
-  {spec:"235/55R19",inch:"19吋",zone:"4A",qty:16,brand:"PS4 SUV / LS3 / HP / PS4",dot:"5024 / 3625 / 5025 / 0224",priceMin:7000,priceMax:7800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS4 SUV",dot:"5024",qty:4,price:7000,origin:""},{mfr:"米其林",model:"LS3",dot:"3625",qty:4,price:7800,origin:""},{mfr:"米其林",model:"HP",dot:"5025",qty:4,price:7800,origin:""},{mfr:"米其林",model:"PS4",dot:"0224",qty:4,price:7000,origin:""}]},
-  {spec:"235/35R19",inch:"19吋",zone:"4A",qty:1,brand:"PS4",dot:"2019",priceMin:3000,priceMax:3000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS4",dot:"2019",qty:1,price:3000,origin:""}]},
-  {spec:"235/50R19",inch:"19吋",zone:"4A",qty:2,brand:"P5",dot:"0426",priceMin:7800,priceMax:7800,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"0426",qty:2,price:7800,origin:""}]},
-  {spec:"235/45R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2825",priceMin:8800,priceMax:8800,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"2825",qty:2,price:8800,origin:""}]},
-  {spec:"235/55R20",inch:"20吋",zone:"4B",qty:8,brand:"SUV+",dot:"4325",priceMin:8500,priceMax:8500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"4325",qty:4,price:8500,origin:""},{mfr:"米其林",model:"SUV+",dot:"4325",qty:4,price:8500,origin:""}]},
-  {spec:"275/50R20",inch:"20吋",zone:"4B",qty:2,brand:"PS4 SUV",dot:"3924",priceMin:10000,priceMax:10000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS4 SUV",dot:"3924",qty:2,price:10000,origin:""}]},
-  {spec:"275/35R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2624",priceMin:9500,priceMax:9500,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"2624",qty:2,price:9500,origin:""}]},
-  {spec:"255/45R19",inch:"19吋",zone:"4A",qty:8,brand:"P5E / EV",dot:"0226 / 3425",priceMin:9500,priceMax:9500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5E",dot:"0226",qty:4,price:9500,origin:""},{mfr:"米其林",model:"EV",dot:"3425",qty:4,price:9500,origin:""}]},
-  {spec:"245/40R19",inch:"19吋",zone:"4A",qty:6,brand:"PS5 / PS4",dot:"2424 / 4323",priceMin:8300,priceMax:9000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"2424",qty:2,price:8300,origin:""},{mfr:"米其林",model:"PS4",dot:"4323",qty:4,price:9000,origin:""}]},
-  {spec:"245/50R19",inch:"19吋",zone:"4A",qty:4,brand:"LS3",dot:"2024",priceMin:9800,priceMax:9800,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"LS3",dot:"2024",qty:4,price:9800,origin:""}]},
-  {spec:"235/40R19",inch:"19吋",zone:"4A",qty:4,brand:"PS5",dot:"3225",priceMin:8800,priceMax:8800,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"3225",qty:4,price:8800,origin:""}]},
-  {spec:"255/50R19",inch:"19吋",zone:"4A",qty:4,brand:"PS4 SUV",dot:"2020",priceMin:3000,priceMax:3000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"PS4 SUV",dot:"2020",qty:4,price:3000,origin:""}]},
-  {spec:"245/45R19",inch:"19吋",zone:"4A",qty:1,brand:"p-zero",dot:"2022",priceMin:5000,priceMax:5000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"p-zero",dot:"2022",qty:1,price:5000,origin:""}]},
-  {spec:"295/30R22",inch:"22吋",zone:"4B",qty:2,brand:"SC7",dot:"3722",priceMin:5000,priceMax:5000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"馬牌",model:"SC7",dot:"3722",qty:2,price:5000,origin:""}]},
-  {spec:"195/85R16C",inch:"16吋",zone:"貨車",qty:4,brand:"XJE4",dot:"0826",priceMin:6500,priceMax:6500,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"米其林",model:"XJE4",dot:"0826",qty:4,price:6500,origin:""}]},
-  {spec:"700R15C",inch:"15吋",zone:"貨車",qty:4,brand:"正新",dot:"5225",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"",model:"正新",dot:"5225",qty:4,price:5000,origin:""}]},
-  {spec:"195/75R16C",inch:"16吋",zone:"貨車",qty:32,brand:"CW-25 / AG3",dot:"0626 / 2026 / 4325",priceMin:3500,priceMax:3800,origin:"",status:"正常",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"0626",qty:2,price:3500,origin:""},{mfr:"米其林",model:"AG3",dot:"2026",qty:20,price:3800,origin:""},{mfr:"米其林",model:"AG3",dot:"4325",qty:10,price:3800,origin:""}]},
-  {spec:"165R13C",inch:"13吋",zone:"貨車",qty:26,brand:"AG3",dot:"2925",priceMin:2400,priceMax:2400,origin:"",status:"正常",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"2925",qty:26,price:2400,origin:""}]},
-  {spec:"175R14C",inch:"14吋",zone:"貨車",qty:10,brand:"CW-25",dot:"1126",priceMin:2600,priceMax:2600,origin:"",status:"正常",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"1126",qty:10,price:2600,origin:""}]},
-  {spec:"700R16C",inch:"16吋",zone:"貨車",qty:4,brand:"正新",dot:"1526",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"",model:"正新",dot:"1526",qty:4,price:5200,origin:""}]},
-  {spec:"215/70R16C",inch:"16吋",zone:"貨車",qty:4,brand:"AG3",dot:"3525",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"3525",qty:4,price:5200,origin:""}]},
-  {spec:"205/65R15C",inch:"15吋",zone:"貨車",qty:6,brand:"AG3",dot:"4823",priceMin:3500,priceMax:3500,origin:"",status:"正常",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"4823",qty:6,price:3500,origin:""}]},
-  {spec:"225/55R17C",inch:"17吋",zone:"貨車",qty:4,brand:"AG3",dot:"1623",priceMin:4000,priceMax:4000,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"1623",qty:4,price:4000,origin:""}]},
-  {spec:"195/70R15C",inch:"15吋",zone:"貨車",qty:5,brand:"R-600",dot:"2025",priceMin:3600,priceMax:3600,origin:"",status:"正常",truck:"是",batches:[{mfr:"普利司通",model:"R-600",dot:"2025",qty:5,price:3600,origin:""}]},
-  {spec:"205/75R16C",inch:"16吋",zone:"貨車",qty:5,brand:"R-205 / AG3",dot:"4025 / 0924 / 2425",priceMin:4600,priceMax:5200,origin:"",status:"正常",truck:"是",batches:[{mfr:"普利司通",model:"R-205",dot:"4025",qty:1,price:4600,origin:""},{mfr:"米其林",model:"AG3",dot:"0924",qty:1,price:5200,origin:""},{mfr:"米其林",model:"AG3",dot:"2425",qty:3,price:5200,origin:""}]},
-  {spec:"185R14C",inch:"14吋",zone:"貨車",qty:31,brand:"AG3",dot:"4425",priceMin:3100,priceMax:3100,origin:"",status:"正常",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"4425",qty:31,price:3100,origin:""}]},
-  {spec:"165R14C",inch:"14吋",zone:"貨車",qty:2,brand:"CW-25",dot:"",priceMin:2600,priceMax:2600,origin:"",status:"低庫存",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"",qty:2,price:2600,origin:""}]},
-  {spec:"155R13C",inch:"13吋",zone:"貨車",qty:14,brand:"CW-25",dot:"0226",priceMin:2000,priceMax:2000,origin:"",status:"正常",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"0226",qty:14,price:2000,origin:""}]},
-  {spec:"15新內胎",inch:"配件",zone:"配件",qty:12,brand:"不含拆裝工資$400",dot:"",priceMin:800,priceMax:800,origin:"",status:"正常",truck:"否",grade:"350",batches:[{mfr:"",model:"不含拆裝工資$400",dot:"",qty:12,price:800,origin:""}]},
-  {spec:"16新內胎",inch:"配件",zone:"配件",qty:10,brand:"不含拆裝工資$400",dot:"",priceMin:800,priceMax:800,origin:"",status:"正常",truck:"否",grade:"350",batches:[{mfr:"",model:"不含拆裝工資$400",dot:"",qty:10,price:800,origin:""}]},
-  {spec:"15新內帶",inch:"配件",zone:"配件",qty:2,brand:"",dot:"",priceMin:300,priceMax:300,origin:"",status:"低庫存",truck:"否",grade:"180",batches:[{mfr:"",model:"",dot:"",qty:2,price:300,origin:""}]},
-  {spec:"16新內帶",inch:"配件",zone:"配件",qty:2,brand:"",dot:"",priceMin:300,priceMax:300,origin:"",status:"低庫存",truck:"否",grade:"190",batches:[{mfr:"",model:"",dot:"",qty:2,price:300,origin:""}]},
-  {spec:"胎壓器",inch:"配件",zone:"配件",qty:2,brand:"太陽牌",dot:"",priceMin:5500,priceMax:5500,origin:"",status:"低庫存",truck:"否",grade:"2300",batches:[{mfr:"",model:"太陽牌",dot:"",qty:2,price:5500,origin:""}]},
-  {spec:"行車紀錄器",inch:"配件",zone:"配件",qty:2,brand:"AR-770新款",dot:"",priceMin:7800,priceMax:7800,origin:"",status:"低庫存",truck:"否",grade:"3300",batches:[{mfr:"",model:"AR-770新款",dot:"",qty:2,price:7800,origin:""}]},
+  {
+    "spec": "175/65R14",
+    "inch": "14吋",
+    "zone": "3A",
+    "qty": 6,
+    "brand": "SA4",
+    "dot": "0226",
+    "priceMin": 2600,
+    "priceMax": 2600,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "0226",
+        "qty": 6,
+        "price": 2600,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185/60R14",
+    "inch": "14吋",
+    "zone": "3A",
+    "qty": 9,
+    "brand": "XM2",
+    "dot": "2025 / 0926 / 1624",
+    "priceMin": 2700,
+    "priceMax": 2700,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "XM2",
+        "dot": "2025",
+        "qty": 4,
+        "price": 2700,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "XM2",
+        "dot": "0926",
+        "qty": 4,
+        "price": 2700,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "XM2",
+        "dot": "1624",
+        "qty": 1,
+        "price": 2700,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185/65R14",
+    "inch": "14吋",
+    "zone": "3A",
+    "qty": 5,
+    "brand": "SA4",
+    "dot": "5125 / 3523",
+    "priceMin": 2700,
+    "priceMax": 2700,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "5125",
+        "qty": 4,
+        "price": 2700,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "3523",
+        "qty": 1,
+        "price": 2700,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185/55R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 7,
+    "brand": "PS3",
+    "dot": "2124",
+    "priceMin": 3200,
+    "priceMax": 3200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS3",
+        "dot": "2124",
+        "qty": 7,
+        "price": 3200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/55R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 4,
+    "brand": "SA4",
+    "dot": "4825",
+    "priceMin": 3200,
+    "priceMax": 3200,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "4825",
+        "qty": 4,
+        "price": 3200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/65R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 3,
+    "brand": "SA4",
+    "dot": "0826",
+    "priceMin": 3200,
+    "priceMax": 3200,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "0826",
+        "qty": 3,
+        "price": 3200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/70R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 10,
+    "brand": "SUV+ / SP-9",
+    "dot": "0625 / 3525",
+    "priceMin": 2900,
+    "priceMax": 3800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SUV+",
+        "dot": "0625",
+        "qty": 6,
+        "price": 3800,
+        "origin": ""
+      },
+      {
+        "mfr": "南港",
+        "model": "SP-9",
+        "dot": "3525",
+        "qty": 4,
+        "price": 2900,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/60R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 15,
+    "brand": "P5 / P4+ / XM2",
+    "dot": "4925 / 2823 / 3025 / 2023",
+    "priceMin": 3000,
+    "priceMax": 3800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4925",
+        "qty": 8,
+        "price": 3800,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2823",
+        "qty": 3,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "XM2",
+        "dot": "3025",
+        "qty": 3,
+        "price": 3600,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "XM2",
+        "dot": "2023",
+        "qty": 1,
+        "price": 3600,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/50R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 2,
+    "brand": "P4+",
+    "dot": "0322*2",
+    "priceMin": 2000,
+    "priceMax": 2000,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "0322*2",
+        "qty": 2,
+        "price": 2000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/55R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 14,
+    "brand": "P4+ / TURANZA6 / P3 / P5",
+    "dot": "1520 / 1525 / 4922 / 3225",
+    "priceMin": 2000,
+    "priceMax": 4000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "1520",
+        "qty": 2,
+        "price": 2000,
+        "origin": ""
+      },
+      {
+        "mfr": "普利司通",
+        "model": "TURANZA6",
+        "dot": "1525",
+        "qty": 4,
+        "price": 3500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P3",
+        "dot": "4922",
+        "qty": 4,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "3225",
+        "qty": 4,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185/55R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 6,
+    "brand": "SA4 / NH-100",
+    "dot": "0626 / 3625 / 4225",
+    "priceMin": 2300,
+    "priceMax": 3800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "0626",
+        "qty": 3,
+        "price": 3800,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "3625",
+        "qty": 1,
+        "price": 3800,
+        "origin": ""
+      },
+      {
+        "mfr": "普利司通",
+        "model": "NH-100",
+        "dot": "4225",
+        "qty": 2,
+        "price": 2300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/65R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 20,
+    "brand": "SX-608 / P4 / SA4",
+    "dot": "4225 / 4025 / 3025",
+    "priceMin": 2500,
+    "priceMax": 3200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "南港",
+        "model": "SX-608",
+        "dot": "4225",
+        "qty": 4,
+        "price": 2500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "4025",
+        "qty": 6,
+        "price": 3200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "3025",
+        "qty": 10,
+        "price": 3200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/50R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 2,
+    "brand": "ER-33",
+    "dot": "4225",
+    "priceMin": 3200,
+    "priceMax": 3200,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "普利司通",
+        "model": "ER-33",
+        "dot": "4225",
+        "qty": 2,
+        "price": 3200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185/60R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 12,
+    "brand": "P4 / XM2",
+    "dot": "2025 / 2024 / 2023 / 2624",
+    "priceMin": 3000,
+    "priceMax": 3000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "2025",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "2024",
+        "qty": 2,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "2023",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "XM2",
+        "dot": "2624",
+        "qty": 8,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185/65R15",
+    "inch": "15吋",
+    "zone": "3A",
+    "qty": 18,
+    "brand": "P4 / SA4",
+    "dot": "3425 / 1124",
+    "priceMin": 3000,
+    "priceMax": 3000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "3425",
+        "qty": 8,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "1124",
+        "qty": 10,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/60R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 2,
+    "brand": "P4+",
+    "dot": "2024",
+    "priceMin": 3400,
+    "priceMax": 3400,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2024",
+        "qty": 2,
+        "price": 3400,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/65R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 4,
+    "brand": "P5",
+    "dot": "3425",
+    "priceMin": 4300,
+    "priceMax": 4300,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "3425",
+        "qty": 4,
+        "price": 4300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/70R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 4,
+    "brand": "SUV+",
+    "dot": "3025",
+    "priceMin": 4300,
+    "priceMax": 4300,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SUV+",
+        "dot": "3025",
+        "qty": 4,
+        "price": 4300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/55R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 16,
+    "brand": "SA4 / P5",
+    "dot": "0426 / 1326",
+    "priceMin": 3600,
+    "priceMax": 3600,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SA4",
+        "dot": "0426",
+        "qty": 8,
+        "price": 3600,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "1326",
+        "qty": 8,
+        "price": 3600,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/60R16",
+    "inch": "16吋",
+    "zone": "3B",
+    "qty": 18,
+    "brand": "P4+ / P4 / UC7",
+    "dot": "3824 / 1123 / 2624",
+    "priceMin": 3000,
+    "priceMax": 3500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "3824",
+        "qty": 13,
+        "price": 3500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "1123",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "馬牌",
+        "model": "UC7",
+        "dot": "2624",
+        "qty": 4,
+        "price": 3500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/45R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 19,
+    "brand": "P5 / PS4 / P4+ / PS5",
+    "dot": "4825 / 3421 / 4324 / 2624",
+    "priceMin": 1000,
+    "priceMax": 4300,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4825",
+        "qty": 4,
+        "price": 4300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4825",
+        "qty": 6,
+        "price": 4300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "3421",
+        "qty": 1,
+        "price": 1000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "4324",
+        "qty": 4,
+        "price": 4200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "2624",
+        "qty": 4,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/55R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 9,
+    "brand": "P3 / P4+",
+    "dot": "2917 / 2523",
+    "priceMin": 3000,
+    "priceMax": 3000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P3",
+        "dot": "2917",
+        "qty": 4,
+        "price": 0,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2523",
+        "qty": 5,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/60R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 21,
+    "brand": "HP / SUV+ / EP / P5 / SUV",
+    "dot": "3824 / 4725 / 1721 / 4125 / 0926 / 4121",
+    "priceMin": 1000,
+    "priceMax": 5300,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "HP",
+        "dot": "3824",
+        "qty": 5,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "SUV+",
+        "dot": "4725",
+        "qty": 3,
+        "price": 5300,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "EP",
+        "dot": "1721",
+        "qty": 2,
+        "price": 1000,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "EP",
+        "dot": "4125",
+        "qty": 4,
+        "price": 5300,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "P5",
+        "dot": "0926",
+        "qty": 6,
+        "price": 5300,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "SUV",
+        "dot": "4121",
+        "qty": 1,
+        "price": 1000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/55R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 4,
+    "brand": "EP",
+    "dot": "3923",
+    "priceMin": 4000,
+    "priceMax": 4000,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "EP",
+        "dot": "3923",
+        "qty": 4,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/45R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 8,
+    "brand": "P4+ / PS5",
+    "dot": "2523 / 3523",
+    "priceMin": 4000,
+    "priceMax": 4000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2523",
+        "qty": 4,
+        "price": 4000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "3523",
+        "qty": 4,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/60R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 15,
+    "brand": "ALENZA / P5",
+    "dot": "2425 / 3125",
+    "priceMin": 4000,
+    "priceMax": 4000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "普利司通",
+        "model": "ALENZA",
+        "dot": "2425",
+        "qty": 8,
+        "price": 4000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "3125",
+        "qty": 7,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/45R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 9,
+    "brand": "P5 / PS5",
+    "dot": "5225 / 1425",
+    "priceMin": 4200,
+    "priceMax": 4200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "5225",
+        "qty": 6,
+        "price": 4200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "1425",
+        "qty": 3,
+        "price": 4200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/45R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 11,
+    "brand": "P4+ / 防爆 / P4 / P5 / PS4",
+    "dot": "5123 / 4821 / 2125 / 2024",
+    "priceMin": 2000,
+    "priceMax": 5500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "5123",
+        "qty": 2,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "防爆",
+        "dot": "",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "4821",
+        "qty": 1,
+        "price": 2000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "2125",
+        "qty": 4,
+        "price": 5500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "2024",
+        "qty": 3,
+        "price": 2500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/55R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 4,
+    "brand": "P5",
+    "dot": "3525",
+    "priceMin": 4500,
+    "priceMax": 4500,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "3525",
+        "qty": 4,
+        "price": 4500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/50R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 3,
+    "brand": "P4 / P4+",
+    "dot": "3423 / 2023",
+    "priceMin": 3000,
+    "priceMax": 3000,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "3423",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2023",
+        "qty": 2,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/60R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 9,
+    "brand": "P5 / P4+",
+    "dot": "4125 / 3525 / 3124",
+    "priceMin": 4300,
+    "priceMax": 5200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4125",
+        "qty": 4,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "3525",
+        "qty": 4,
+        "price": 4300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "3124",
+        "qty": 1,
+        "price": 4300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/65R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 31,
+    "brand": "P5 / EP / HP / SUV+ / SUV / PS4 SUV",
+    "dot": "0526 / 4423 / 2024 / 2023 / 3821 / 2925 / 5023 / 2623",
+    "priceMin": 1000,
+    "priceMax": 4500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "0526",
+        "qty": 17,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4423",
+        "qty": 2,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "EP",
+        "dot": "2024",
+        "qty": 2,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "EP",
+        "dot": "2023",
+        "qty": 3,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "HP",
+        "dot": "3821",
+        "qty": 2,
+        "price": 1000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SUV+",
+        "dot": "2925",
+        "qty": 2,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "EP",
+        "dot": "5023",
+        "qty": 1,
+        "price": 4000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SUV",
+        "dot": "",
+        "qty": 1,
+        "price": 4000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4 SUV",
+        "dot": "2623",
+        "qty": 1,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/45R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 16,
+    "brand": "EP / P5E / PS5",
+    "dot": "4724 / 1026 / 1125",
+    "priceMin": 4500,
+    "priceMax": 6200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "EP",
+        "dot": "4724",
+        "qty": 4,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5E",
+        "dot": "1026",
+        "qty": 4,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5E",
+        "dot": "1026",
+        "qty": 4,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "1125",
+        "qty": 4,
+        "price": 6200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/55R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 10,
+    "brand": "UC7 / SUV+",
+    "dot": "4924 / 4124",
+    "priceMin": 4800,
+    "priceMax": 5000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "馬牌",
+        "model": "UC7",
+        "dot": "4924",
+        "qty": 6,
+        "price": 5000,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "SUV+",
+        "dot": "4124",
+        "qty": 4,
+        "price": 4800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/55R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 19,
+    "brand": "P5 / PS5",
+    "dot": "0126 / 4223",
+    "priceMin": 3500,
+    "priceMax": 4300,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "0126",
+        "qty": 10,
+        "price": 4300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "4223",
+        "qty": 4,
+        "price": 3500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "0126",
+        "qty": 5,
+        "price": 4300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/55R17",
+    "inch": "17吋",
+    "zone": "3C",
+    "qty": 7,
+    "brand": "P3 / P5 / P4+",
+    "dot": "2125 / 2024",
+    "priceMin": 5000,
+    "priceMax": 5300,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P3",
+        "dot": "2125",
+        "qty": 2,
+        "price": 5300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "2125",
+        "qty": 4,
+        "price": 5300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2024",
+        "qty": 1,
+        "price": 5000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/45R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 14,
+    "brand": "P5 / PS5 / PS4",
+    "dot": "4924 / 3724",
+    "priceMin": 5000,
+    "priceMax": 5300,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4924",
+        "qty": 5,
+        "price": 5000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "3724",
+        "qty": 8,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "",
+        "qty": 1,
+        "price": 5300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/40R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 5,
+    "brand": "PS5 / PS4",
+    "dot": "3424 / 1721",
+    "priceMin": 2000,
+    "priceMax": 6500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "3424",
+        "qty": 4,
+        "price": 6500,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "PS4",
+        "dot": "1721",
+        "qty": 1,
+        "price": 2000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/50R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 6,
+    "brand": "P4 / 防爆",
+    "dot": "4224 / 3525",
+    "priceMin": 8300,
+    "priceMax": 9500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4",
+        "dot": "4224",
+        "qty": 2,
+        "price": 8300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "防爆",
+        "dot": "3525",
+        "qty": 4,
+        "price": 9500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/40R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 5,
+    "brand": "P4+ / PS5",
+    "dot": "2023 / 4024",
+    "priceMin": 4000,
+    "priceMax": 4500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P4+",
+        "dot": "2023",
+        "qty": 2,
+        "price": 4500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "4024",
+        "qty": 3,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/45R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 4,
+    "brand": "防爆",
+    "dot": "1922",
+    "priceMin": 5000,
+    "priceMax": 5000,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "防爆",
+        "dot": "1922",
+        "qty": 4,
+        "price": 5000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/55R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 22,
+    "brand": "EP / P5",
+    "dot": "4625 / 4725 / 4123",
+    "priceMin": 5000,
+    "priceMax": 5000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "EP",
+        "dot": "4625",
+        "qty": 1,
+        "price": 5000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "4625",
+        "qty": 9,
+        "price": 5000,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "P5",
+        "dot": "4725",
+        "qty": 8,
+        "price": 5000,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "EP",
+        "dot": "4123",
+        "qty": 4,
+        "price": 5000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/50R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 14,
+    "brand": "P5",
+    "dot": "1025",
+    "priceMin": 5800,
+    "priceMax": 5800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "P5",
+        "dot": "1025",
+        "qty": 6,
+        "price": 5800,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "P5",
+        "dot": "1025",
+        "qty": 8,
+        "price": 5800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/60R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 29,
+    "brand": "P5 / EP / PS4 SUV / SUV+",
+    "dot": "0926 / 3925 / 4819 / 4525",
+    "priceMin": 5200,
+    "priceMax": 5200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "P5",
+        "dot": "0926",
+        "qty": 12,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "EP",
+        "dot": "3925",
+        "qty": 4,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "PS4 SUV",
+        "dot": "4819",
+        "qty": 2,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "SUV+",
+        "dot": "4525",
+        "qty": 11,
+        "price": 5200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/50R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 10,
+    "brand": "P5E / EP",
+    "dot": "0526 / 5125",
+    "priceMin": 5200,
+    "priceMax": 5200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "P5E",
+        "dot": "0526",
+        "qty": 4,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "",
+        "model": "EP",
+        "dot": "5125",
+        "qty": 6,
+        "price": 5200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/50R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 4,
+    "brand": "SUV+",
+    "dot": "2625",
+    "priceMin": 5400,
+    "priceMax": 5400,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "SUV+",
+        "dot": "2625",
+        "qty": 4,
+        "price": 5400,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/40R18",
+    "inch": "18吋",
+    "zone": "3D",
+    "qty": 4,
+    "brand": "P4+",
+    "dot": "2825",
+    "priceMin": 6500,
+    "priceMax": 6500,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "P4+",
+        "dot": "2825",
+        "qty": 4,
+        "price": 6500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/55R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 9,
+    "brand": "SUV+ / PS4",
+    "dot": "0126 / 2921",
+    "priceMin": 3000,
+    "priceMax": 7200,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SUV+",
+        "dot": "0126",
+        "qty": 8,
+        "price": 7200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "2921",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/55R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 16,
+    "brand": "PS4 SUV / LS3 / HP / PS4",
+    "dot": "5024 / 3625 / 5025 / 0224",
+    "priceMin": 7000,
+    "priceMax": 7800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS4 SUV",
+        "dot": "5024",
+        "qty": 4,
+        "price": 7000,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "LS3",
+        "dot": "3625",
+        "qty": 4,
+        "price": 7800,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "HP",
+        "dot": "5025",
+        "qty": 4,
+        "price": 7800,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "0224",
+        "qty": 4,
+        "price": 7000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/35R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 1,
+    "brand": "PS4",
+    "dot": "2019",
+    "priceMin": 3000,
+    "priceMax": 3000,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "2019",
+        "qty": 1,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/50R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 2,
+    "brand": "P5",
+    "dot": "0426",
+    "priceMin": 7800,
+    "priceMax": 7800,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5",
+        "dot": "0426",
+        "qty": 2,
+        "price": 7800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/45R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 2,
+    "brand": "PS5",
+    "dot": "2825",
+    "priceMin": 8800,
+    "priceMax": 8800,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "2825",
+        "qty": 2,
+        "price": 8800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/55R20",
+    "inch": "20吋",
+    "zone": "4B",
+    "qty": 8,
+    "brand": "SUV+",
+    "dot": "4325",
+    "priceMin": 8500,
+    "priceMax": 8500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "SUV+",
+        "dot": "4325",
+        "qty": 4,
+        "price": 8500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "SUV+",
+        "dot": "4325",
+        "qty": 4,
+        "price": 8500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "275/50R20",
+    "inch": "20吋",
+    "zone": "4B",
+    "qty": 2,
+    "brand": "PS4 SUV",
+    "dot": "3924",
+    "priceMin": 10000,
+    "priceMax": 10000,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS4 SUV",
+        "dot": "3924",
+        "qty": 2,
+        "price": 10000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "275/35R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 2,
+    "brand": "PS5",
+    "dot": "2624",
+    "priceMin": 9500,
+    "priceMax": 9500,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "2624",
+        "qty": 2,
+        "price": 9500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "255/45R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 8,
+    "brand": "P5E / EV",
+    "dot": "0226 / 3425",
+    "priceMin": 9500,
+    "priceMax": 9500,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "P5E",
+        "dot": "0226",
+        "qty": 4,
+        "price": 9500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "EV",
+        "dot": "3425",
+        "qty": 4,
+        "price": 9500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/40R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 6,
+    "brand": "PS5 / PS4",
+    "dot": "2424 / 4323",
+    "priceMin": 8300,
+    "priceMax": 9000,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "2424",
+        "qty": 2,
+        "price": 8300,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "PS4",
+        "dot": "4323",
+        "qty": 4,
+        "price": 9000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/50R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 4,
+    "brand": "LS3",
+    "dot": "2024",
+    "priceMin": 9800,
+    "priceMax": 9800,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "LS3",
+        "dot": "2024",
+        "qty": 4,
+        "price": 9800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "235/40R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 4,
+    "brand": "PS5",
+    "dot": "3225",
+    "priceMin": 8800,
+    "priceMax": 8800,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS5",
+        "dot": "3225",
+        "qty": 4,
+        "price": 8800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "255/50R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 4,
+    "brand": "PS4 SUV",
+    "dot": "2020",
+    "priceMin": 3000,
+    "priceMax": 3000,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "PS4 SUV",
+        "dot": "2020",
+        "qty": 4,
+        "price": 3000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "245/45R19",
+    "inch": "19吋",
+    "zone": "4A",
+    "qty": 1,
+    "brand": "p-zero",
+    "dot": "2022",
+    "priceMin": 5000,
+    "priceMax": 5000,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "p-zero",
+        "dot": "2022",
+        "qty": 1,
+        "price": 5000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "295/30R22",
+    "inch": "22吋",
+    "zone": "4B",
+    "qty": 2,
+    "brand": "SC7",
+    "dot": "3722",
+    "priceMin": 5000,
+    "priceMax": 5000,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "batches": [
+      {
+        "mfr": "馬牌",
+        "model": "SC7",
+        "dot": "3722",
+        "qty": 2,
+        "price": 5000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/85R16C",
+    "inch": "16吋",
+    "zone": "貨車",
+    "qty": 4,
+    "brand": "XJE4",
+    "dot": "0826",
+    "priceMin": 6500,
+    "priceMax": 6500,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "XJE4",
+        "dot": "0826",
+        "qty": 4,
+        "price": 6500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "700R15C",
+    "inch": "15吋",
+    "zone": "貨車",
+    "qty": 4,
+    "brand": "正新",
+    "dot": "5225",
+    "priceMin": 5000,
+    "priceMax": 5000,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "正新",
+        "dot": "5225",
+        "qty": 4,
+        "price": 5000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/75R16C",
+    "inch": "16吋",
+    "zone": "貨車",
+    "qty": 32,
+    "brand": "CW-25 / AG3",
+    "dot": "0626 / 2026 / 4325",
+    "priceMin": 3500,
+    "priceMax": 3800,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "南港",
+        "model": "CW-25",
+        "dot": "0626",
+        "qty": 2,
+        "price": 3500,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "2026",
+        "qty": 20,
+        "price": 3800,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "4325",
+        "qty": 10,
+        "price": 3800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "165R13C",
+    "inch": "13吋",
+    "zone": "貨車",
+    "qty": 26,
+    "brand": "AG3",
+    "dot": "2925",
+    "priceMin": 2400,
+    "priceMax": 2400,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "2925",
+        "qty": 26,
+        "price": 2400,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "175R14C",
+    "inch": "14吋",
+    "zone": "貨車",
+    "qty": 10,
+    "brand": "CW-25",
+    "dot": "1126",
+    "priceMin": 2600,
+    "priceMax": 2600,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "南港",
+        "model": "CW-25",
+        "dot": "1126",
+        "qty": 10,
+        "price": 2600,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "700R16C",
+    "inch": "16吋",
+    "zone": "貨車",
+    "qty": 4,
+    "brand": "正新",
+    "dot": "1526",
+    "priceMin": 5200,
+    "priceMax": 5200,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "正新",
+        "dot": "1526",
+        "qty": 4,
+        "price": 5200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "215/70R16C",
+    "inch": "16吋",
+    "zone": "貨車",
+    "qty": 4,
+    "brand": "AG3",
+    "dot": "3525",
+    "priceMin": 5200,
+    "priceMax": 5200,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "3525",
+        "qty": 4,
+        "price": 5200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/65R15C",
+    "inch": "15吋",
+    "zone": "貨車",
+    "qty": 6,
+    "brand": "AG3",
+    "dot": "4823",
+    "priceMin": 3500,
+    "priceMax": 3500,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "4823",
+        "qty": 6,
+        "price": 3500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "225/55R17C",
+    "inch": "17吋",
+    "zone": "貨車",
+    "qty": 4,
+    "brand": "AG3",
+    "dot": "1623",
+    "priceMin": 4000,
+    "priceMax": 4000,
+    "origin": "",
+    "status": "需補貨",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "1623",
+        "qty": 4,
+        "price": 4000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "195/70R15C",
+    "inch": "15吋",
+    "zone": "貨車",
+    "qty": 5,
+    "brand": "R-600",
+    "dot": "2025",
+    "priceMin": 3600,
+    "priceMax": 3600,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "普利司通",
+        "model": "R-600",
+        "dot": "2025",
+        "qty": 5,
+        "price": 3600,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "205/75R16C",
+    "inch": "16吋",
+    "zone": "貨車",
+    "qty": 5,
+    "brand": "R-205 / AG3",
+    "dot": "4025 / 0924 / 2425",
+    "priceMin": 4600,
+    "priceMax": 5200,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "普利司通",
+        "model": "R-205",
+        "dot": "4025",
+        "qty": 1,
+        "price": 4600,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "0924",
+        "qty": 1,
+        "price": 5200,
+        "origin": ""
+      },
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "2425",
+        "qty": 3,
+        "price": 5200,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "185R14C",
+    "inch": "14吋",
+    "zone": "貨車",
+    "qty": 31,
+    "brand": "AG3",
+    "dot": "4425",
+    "priceMin": 3100,
+    "priceMax": 3100,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "米其林",
+        "model": "AG3",
+        "dot": "4425",
+        "qty": 31,
+        "price": 3100,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "165R14C",
+    "inch": "14吋",
+    "zone": "貨車",
+    "qty": 2,
+    "brand": "CW-25",
+    "dot": "",
+    "priceMin": 2600,
+    "priceMax": 2600,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "南港",
+        "model": "CW-25",
+        "dot": "",
+        "qty": 2,
+        "price": 2600,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "155R13C",
+    "inch": "13吋",
+    "zone": "貨車",
+    "qty": 14,
+    "brand": "CW-25",
+    "dot": "0226",
+    "priceMin": 2000,
+    "priceMax": 2000,
+    "origin": "",
+    "status": "正常",
+    "truck": "是",
+    "batches": [
+      {
+        "mfr": "南港",
+        "model": "CW-25",
+        "dot": "0226",
+        "qty": 14,
+        "price": 2000,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "15新內胎",
+    "inch": "配件",
+    "zone": "配件",
+    "qty": 12,
+    "brand": "不含拆裝工資$400",
+    "dot": "",
+    "priceMin": 800,
+    "priceMax": 800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "grade": "350",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "不含拆裝工資$400",
+        "dot": "",
+        "qty": 12,
+        "price": 800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "16新內胎",
+    "inch": "配件",
+    "zone": "配件",
+    "qty": 10,
+    "brand": "不含拆裝工資$400",
+    "dot": "",
+    "priceMin": 800,
+    "priceMax": 800,
+    "origin": "",
+    "status": "正常",
+    "truck": "否",
+    "grade": "350",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "不含拆裝工資$400",
+        "dot": "",
+        "qty": 10,
+        "price": 800,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "15新內帶",
+    "inch": "配件",
+    "zone": "配件",
+    "qty": 2,
+    "brand": "",
+    "dot": "",
+    "priceMin": 300,
+    "priceMax": 300,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "grade": "180",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "",
+        "dot": "",
+        "qty": 2,
+        "price": 300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "16新內帶",
+    "inch": "配件",
+    "zone": "配件",
+    "qty": 2,
+    "brand": "",
+    "dot": "",
+    "priceMin": 300,
+    "priceMax": 300,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "grade": "190",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "",
+        "dot": "",
+        "qty": 2,
+        "price": 300,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "胎壓器",
+    "inch": "配件",
+    "zone": "配件",
+    "qty": 2,
+    "brand": "太陽牌",
+    "dot": "",
+    "priceMin": 5500,
+    "priceMax": 5500,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "grade": "2300",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "太陽牌",
+        "dot": "",
+        "qty": 2,
+        "price": 5500,
+        "origin": ""
+      }
+    ]
+  },
+  {
+    "spec": "行車紀錄器",
+    "inch": "配件",
+    "zone": "配件",
+    "qty": 2,
+    "brand": "AR-770新款",
+    "dot": "",
+    "priceMin": 7800,
+    "priceMax": 7800,
+    "origin": "",
+    "status": "低庫存",
+    "truck": "否",
+    "grade": "3300",
+    "batches": [
+      {
+        "mfr": "",
+        "model": "AR-770新款",
+        "dot": "",
+        "qty": 2,
+        "price": 7800,
+        "origin": ""
+      }
+    ]
+  }
 ];
 
 const ZONES_INFO = {
