@@ -266,6 +266,7 @@
   .location-item .loc-name { font-size: 13px; color: var(--text-primary); font-weight: 500; }
   .location-item .loc-detail { font-size: 12px; color: var(--text-muted); }
   .location-item .loc-model { font-size: 12px; color: var(--accent); margin-top: 2px; }
+  .location-item .loc-price { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
   .location-item .loc-count {
     font-size: 18px;
     font-weight: 700;
@@ -797,8 +798,8 @@
               <div class="meta-value" id="res-dot"></div>
             </div>
             <div class="meta-item">
-              <div class="meta-label">報價範圍</div>
-              <div class="meta-value" id="res-price"></div>
+              <div class="meta-label">型號 / 報價</div>
+              <div class="meta-value" id="res-price" style="font-size:13px"></div>
             </div>
             <div class="meta-item">
               <div class="meta-label">產地</div>
@@ -972,7 +973,7 @@
         <div class="table-wrapper">
           <table>
             <thead>
-              <tr><th>規格</th><th>吋數</th><th>倉位</th><th>庫存</th><th>型號</th><th>DOT</th><th>報價範圍</th><th>產地</th><th>狀態</th><th>操作</th></tr>
+              <tr><th>規格</th><th>吋數</th><th>倉位</th><th>庫存</th><th>型號/品牌</th><th>DOT</th><th>報價</th><th>產地</th><th>狀態</th><th>操作</th></tr>
             </thead>
             <tbody id="all-body"></tbody>
           </table>
@@ -1145,18 +1146,15 @@
       <h2 style="margin:0">修改庫存</h2>
       <button class="btn btn-ghost btn-sm" onclick="closeEditModal()">✕ 關閉</button>
     </div>
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">規格：<span id="edit-spec" style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:600"></span></div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">規格：<span id="edit-spec" style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:600"></span></div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">型號：<span id="edit-model" style="color:var(--text-primary);font-weight:600"></span></div>
     <div class="form-group">
-      <label>庫存數量（條/件）</label>
+      <label>此型號庫存數量（條/件）</label>
       <input type="number" id="edit-qty" min="0">
     </div>
     <div class="form-group">
-      <label>報價下限（NT$）</label>
-      <input type="number" id="edit-price-min" min="0">
-    </div>
-    <div class="form-group">
-      <label>報價上限（NT$，單一價格時與下限相同）</label>
-      <input type="number" id="edit-price-max" min="0">
+      <label>此型號報價（NT$）</label>
+      <input type="number" id="edit-price" min="0">
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeEditModal()">取消</button>
@@ -1185,93 +1183,93 @@
 // ══════════════════════════════════════
 // DATA
 // ══════════════════════════════════════
-const INVENTORY_KEY = 'tongyu_inventory_v5';
+const INVENTORY_KEY = 'tongyu_inventory_v6';
 
 const BASE_TX_LOG = [];
 
 const BASE_DATA = [
-  {spec:"175/65R14",inch:"14吋",zone:"3A",qty:6,brand:"SA4",dot:"0226",priceMin:2600,priceMax:2600,origin:"泰",status:"正常",loc:"3A區 → 3A：6條｜米其林 SA4｜DOT 0226",truck:"否"},
-  {spec:"185/60R14",inch:"14吋",zone:"3A",qty:9,brand:"XM2",dot:"2025 / 0926 / 1624",priceMin:2700,priceMax:2700,origin:"大",status:"正常",loc:"3A區 → 3A：4條｜米其林 XM2｜DOT 2025 / 3A區 → 3A：4條｜米其林 XM2｜DOT 0926 / 3A區 → 3A：1條｜米其林 XM2｜DOT 1624",truck:"否"},
-  {spec:"185/65R14",inch:"14吋",zone:"3A",qty:5,brand:"SA4",dot:"5125 / 3523",priceMin:2700,priceMax:2700,origin:"台",status:"正常",loc:"3A區 → 3A：4條｜米其林 SA4｜DOT 5125 / 3A區 → 3A：1條｜米其林 SA4｜DOT 3523",truck:"否"},
-  {spec:"185/55R15",inch:"15吋",zone:"3A",qty:7,brand:"PS3",dot:"2124",priceMin:3200,priceMax:3200,origin:"",status:"正常",loc:"3A區 → 3A：7條｜米其林 PS3｜DOT 2124",truck:"否"},
-  {spec:"195/55R15",inch:"15吋",zone:"3A",qty:4,brand:"SA4",dot:"4825",priceMin:3200,priceMax:3200,origin:"大",status:"需補貨",loc:"3A區 → 3A：4條｜米其林 SA4｜DOT 4825",truck:"否"},
-  {spec:"205/65R15",inch:"15吋",zone:"3A",qty:3,brand:"SA4",dot:"0826",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",loc:"3A區 → 3A：3條｜米其林 SA4｜DOT 0826",truck:"否"},
-  {spec:"205/70R15",inch:"15吋",zone:"3A",qty:31,brand:"SUV+ / SP-9",dot:"0625 / 3525",priceMin:2900,priceMax:3800,origin:"",status:"正常",loc:"3A區 → 3A：6條｜米其林 SUV+｜DOT 0625 / 3A區 → 3A：2條｜南港 SP-9｜DOT 3525 / 3A區 → 3A：23條｜南港 SP-9｜DOT 3525",truck:"否"},
-  {spec:"205/60R16",inch:"16吋",zone:"3B",qty:15,brand:"P5 / P4+ / XM2",dot:"4925 / 2823 / 3025 / 2023",priceMin:3000,priceMax:3800,origin:"",status:"正常",loc:"3B區 → 3B：8條｜米其林 P5｜DOT 4925 / 3B區 → 3B：3條｜米其林 P4+｜DOT 2823 / 3B區 → 3B：3條｜米其林 XM2｜DOT 3025 / 3B區 → 3B：1條｜米其林 XM2｜DOT 2023",truck:"否"},
-  {spec:"195/50R15",inch:"15吋",zone:"3A",qty:2,brand:"P4+",dot:"0322*2",priceMin:2000,priceMax:2000,origin:"",status:"低庫存",loc:"3A區 → 3A：2條｜米其林 P4+｜DOT 0322*2",truck:"否"},
-  {spec:"195/55R16",inch:"16吋",zone:"3B",qty:14,brand:"P4+ / TURANZA6 / P3 / P5",dot:"1520 / 1525 / 4922 / 3225",priceMin:2000,priceMax:4000,origin:"泰",status:"正常",loc:"3B區 → 3B：2條｜米其林 P4+｜DOT 1520 / 3B區 → 3B：4條｜普利司通 TURANZA6｜DOT 1525 / 3B區 → 3B：4條｜米其林 P3｜DOT 4922 / 3B區 → 3B：4條｜米其林 P5｜DOT 3225",truck:"否"},
-  {spec:"185/55R16",inch:"16吋",zone:"3B",qty:6,brand:"SA4 / NH-100",dot:"0626 / 3625 / 4225",priceMin:2300,priceMax:3800,origin:"泰",status:"正常",loc:"3B區 → 3B：3條｜米其林 SA4｜DOT 0626 / 3B區 → 3B：1條｜米其林 SA4｜DOT 3625 / 3B區 → 3B：2條｜普利司通 NH-100｜DOT 4225",truck:"否"},
-  {spec:"195/65R15",inch:"15吋",zone:"3A",qty:36,brand:"SX-608 / P4 / SA4",dot:"4225 / 4025 / 3025",priceMin:2500,priceMax:3200,origin:"",status:"正常",loc:"3A區 → 3A：4條｜南港 SX-608｜DOT 4225 / 3A區 → 3A：22條｜米其林 P4｜DOT 4025 / 3A區 → 3A：10條｜米其林 SA4｜DOT 3025",truck:"否"},
-  {spec:"195/50R16",inch:"16吋",zone:"3B",qty:2,brand:"ER-33",dot:"4225",priceMin:3200,priceMax:3200,origin:"大",status:"低庫存",loc:"3B區 → 3B：2條｜普利司通 ER-33｜DOT 4225",truck:"否"},
-  {spec:"185/60R15",inch:"15吋",zone:"3A",qty:12,brand:"P4 / XM2",dot:"2025 / 2024 / 2023 / 2624",priceMin:3000,priceMax:3000,origin:"",status:"正常",loc:"3A區 → 3A：1條｜米其林 P4｜DOT 2025 / 3A區 → 3A：2條｜米其林 P4｜DOT 2024 / 3A區 → 3A：1條｜米其林 P4｜DOT 2023 / 3A區 → 3A：8條｜米其林 XM2｜DOT 2624",truck:"否"},
-  {spec:"185/65R15",inch:"15吋",zone:"3A",qty:18,brand:"P4 / SA4",dot:"3425 / 1124",priceMin:3000,priceMax:3000,origin:"",status:"正常",loc:"3A區 → 3A：8條｜米其林 P4｜DOT 3425 / 3A區 → 3A：10條｜米其林 SA4｜DOT 1124",truck:"否"},
-  {spec:"195/60R16",inch:"16吋",zone:"3B",qty:6,brand:"P4+",dot:"2024",priceMin:3400,priceMax:3400,origin:"",status:"正常",loc:"3B區 → 3B：6條｜米其林 P4+｜DOT 2024",truck:"否"},
-  {spec:"215/65R16",inch:"16吋",zone:"3B",qty:4,brand:"P5",dot:"3425",priceMin:4300,priceMax:4300,origin:"",status:"需補貨",loc:"3B區 → 3B：4條｜米其林 P5｜DOT 3425",truck:"否"},
-  {spec:"215/70R16",inch:"16吋",zone:"3B",qty:4,brand:"SUV+",dot:"3025",priceMin:4300,priceMax:4300,origin:"",status:"需補貨",loc:"3B區 → 3B：4條｜米其林 SUV+｜DOT 3025",truck:"否"},
-  {spec:"205/55R16",inch:"16吋",zone:"3B",qty:16,brand:"SA4 / P5",dot:"0426 / 1326",priceMin:3600,priceMax:3600,origin:"大",status:"正常",loc:"3B區 → 3B：8條｜米其林 SA4｜DOT 0426 / 3B區 → 3B：8條｜米其林 P5｜DOT 1326",truck:"否"},
-  {spec:"215/60R16",inch:"16吋",zone:"3B",qty:18,brand:"P4+ / P4 / UC7",dot:"3824 / 1123 / 2624",priceMin:3000,priceMax:3500,origin:"大",status:"正常",loc:"3B區 → 3B：13條｜米其林 P4+｜DOT 3824 / 3B區 → 3B：1條｜米其林 P4｜DOT 1123 / 3B區 → 3B：4條｜馬牌 UC7｜DOT 2624",truck:"否"},
-  {spec:"225/45R17",inch:"17吋",zone:"3C",qty:19,brand:"P5 / PS4 / P4+ / PS5",dot:"4825 / 3421 / 4324 / 2624",priceMin:1000,priceMax:4300,origin:"大",status:"正常",loc:"3C區 → 3C：4條｜米其林 P5｜DOT 4825 / 3C區 → 3C：6條｜米其林 P5｜DOT 4825 / 3C區 → 3C：1條｜米其林 PS4｜DOT 3421 / 3C區 → 3C：4條｜米其林 P4+｜DOT 4324 / 3C區 → 3C：4條｜米其林 PS5｜DOT 2624",truck:"否"},
-  {spec:"235/55R17",inch:"17吋",zone:"3C",qty:9,brand:"P3 / P4+",dot:"2917 / 2523",priceMin:3000,priceMax:3000,origin:"",status:"正常",loc:"3C區 → 3C：4條｜米其林 P3｜DOT 2917 / 3C區 → 3C：5條｜米其林 P4+｜DOT 2523",truck:"否"},
-  {spec:"235/60R18",inch:"18吋",zone:"3D",qty:21,brand:"HP / SUV+ / EP / P5 / SUV",dot:"3824 / 4725 / 1721 / 4125 / 0926 / 4121",priceMin:1000,priceMax:5300,origin:"",status:"正常",loc:"3D區 → 3D：5條｜米其林 HP｜DOT 3824 / 3D區 → 3D：3條｜SUV+｜DOT 4725 / 3D區 → 3D：2條｜EP｜DOT 1721 / 3D區 → 3D：4條｜EP｜DOT 4125 / 3D區 → 3D：6條｜P5｜DOT 0926 / 3D區 → 3D：1條｜SUV｜DOT 4121",truck:"否"},
-  {spec:"215/55R18",inch:"18吋",zone:"3D",qty:4,brand:"EP",dot:"3923",priceMin:4000,priceMax:4000,origin:"",status:"需補貨",loc:"3D區 → 3D：4條｜米其林 EP｜DOT 3923",truck:"否"},
-  {spec:"215/45R18",inch:"18吋",zone:"3D",qty:8,brand:"P4+ / PS5",dot:"2523 / 3523",priceMin:4000,priceMax:4000,origin:"",status:"正常",loc:"3D區 → 3D：4條｜米其林 P4+｜DOT 2523 / 3D區 → 3D：4條｜米其林 PS5｜DOT 3523",truck:"否"},
-  {spec:"215/60R17",inch:"17吋",zone:"3C",qty:15,brand:"ALENZA / P5",dot:"2425 / 3125",priceMin:4000,priceMax:4000,origin:"",status:"正常",loc:"3C區 → 3C：8條｜普利司通 ALENZA｜DOT 2425 / 3C區 → 3C：7條｜米其林 P5｜DOT 3125",truck:"否"},
-  {spec:"215/45R17",inch:"17吋",zone:"3C",qty:9,brand:"P5 / PS5",dot:"5225 / 1425",priceMin:4200,priceMax:4200,origin:"",status:"正常",loc:"3C區 → 3C：6條｜米其林 P5｜DOT 5225 / 3C區 → 3C：3條｜米其林 PS5｜DOT 1425",truck:"否"},
-  {spec:"245/45R17",inch:"17吋",zone:"3C",qty:11,brand:"P4+ / 防爆 / P4 / P5 / PS4",dot:"5123 / 4821 / 2125 / 2024",priceMin:2000,priceMax:5500,origin:"",status:"正常",loc:"3C區 → 3C：2條｜米其林 P4+｜DOT 5123 / 3C區 → 3C：1條｜米其林 防爆 / 3C區 → 3C：1條｜米其林 P4｜DOT 4821 / 3C區 → 3C：4條｜米其林 P5｜DOT 2125 / 3C區 → 3C：3條｜米其林 PS4｜DOT 2024",truck:"否"},
-  {spec:"205/55R17",inch:"17吋",zone:"3C",qty:4,brand:"P5",dot:"3525",priceMin:4500,priceMax:4500,origin:"",status:"需補貨",loc:"3C區 → 3C：4條｜米其林 P5｜DOT 3525",truck:"否"},
-  {spec:"225/50R17",inch:"17吋",zone:"3C",qty:3,brand:"P4 / P4+",dot:"3423 / 2023",priceMin:3000,priceMax:3000,origin:"",status:"需補貨",loc:"3C區 → 3C：1條｜米其林 P4｜DOT 3423 / 3C區 → 3C：2條｜米其林 P4+｜DOT 2023",truck:"否"},
-  {spec:"225/60R17",inch:"17吋",zone:"3C",qty:9,brand:"P5 / P4+",dot:"4125 / 3525 / 3124",priceMin:4300,priceMax:5200,origin:"",status:"正常",loc:"3C區 → 3C：4條｜米其林 P5｜DOT 4125 / 3C區 → 3C：4條｜米其林 P5｜DOT 3525 / 3C區 → 3C：1條｜米其林 P4+｜DOT 3124",truck:"否"},
-  {spec:"225/65R17",inch:"17吋",zone:"3C",qty:31,brand:"P5 / EP / HP / SUV+ / SUV / PS4 SUV",dot:"0526 / 4423 / 2024 / 2023 / 3821 / 2925 / 5023 / 2623",priceMin:1000,priceMax:4500,origin:"",status:"正常",loc:"3C區 → 3C：17條｜米其林 P5｜DOT 0526 / 3C區 → 3C：2條｜米其林 P5｜DOT 4423 / 3C區 → 3C：2條｜米其林 EP｜DOT 2024 / 3C區 → 3C：3條｜米其林 EP｜DOT 2023 / 3C區 → 3C：2條｜米其林 HP｜DOT 3821 / 3C區 → 3C：2條｜米其林 SUV+｜DOT 2925 / 3C區 → 3C：1條｜米其林 EP｜DOT 5023 / 3C區 → 3C：1條｜米其林 SUV / 3C區 → 3C：1條｜米其林 PS4 SUV｜DOT 2623",truck:"否"},
-  {spec:"235/45R18",inch:"18吋",zone:"3D",qty:16,brand:"EP / P5E / PS5",dot:"4724 / 1026 / 1125",priceMin:4500,priceMax:6200,origin:"",status:"正常",loc:"3D區 → 3D：4條｜米其林 EP｜DOT 4724 / 3D區 → 3D：4條｜米其林 P5E｜DOT 1026 / 3D區 → 3D：4條｜米其林 P5E｜DOT 1026 / 3D區 → 3D：4條｜米其林 PS5｜DOT 1125",truck:"否"},
-  {spec:"225/55R18",inch:"18吋",zone:"3D",qty:10,brand:"UC7 / SUV+",dot:"4924 / 4124",priceMin:4800,priceMax:5000,origin:"",status:"正常",loc:"3D區 → 3D：6條｜馬牌 UC7｜DOT 4924 / 3D區 → 3D：4條｜SUV+｜DOT 4124",truck:"否"},
-  {spec:"215/55R17",inch:"17吋",zone:"3C",qty:19,brand:"P5 / PS5",dot:"0126 / 4223",priceMin:3500,priceMax:4300,origin:"",status:"正常",loc:"3C區 → 3C：10條｜米其林 P5｜DOT 0126 / 3C區 → 3C：4條｜米其林 PS5｜DOT 4223 / 3C區 → 3C：5條｜米其林 P5｜DOT 0126",truck:"否"},
-  {spec:"225/55R17",inch:"17吋",zone:"3C",qty:7,brand:"P3 / P5 / P4+",dot:"2125 / 2024",priceMin:5000,priceMax:5300,origin:"",status:"正常",loc:"3C區 → 3C：2條｜米其林 P3｜DOT 2125 / 3C區 → 3C：4條｜米其林 P5｜DOT 2125 / 3C區 → 3C：1條｜米其林 P4+｜DOT 2024",truck:"否"},
-  {spec:"225/45R18",inch:"18吋",zone:"3D",qty:14,brand:"P5 / PS5 / PS4",dot:"4924 / 3724",priceMin:5000,priceMax:5300,origin:"",status:"正常",loc:"3D區 → 3D：5條｜米其林 P5｜DOT 4924 / 3D區 → 3D：8條｜米其林 PS5｜DOT 3724 / 3D區 → 3D：1條｜米其林 PS4",truck:"否"},
-  {spec:"245/40R18",inch:"18吋",zone:"3D",qty:5,brand:"PS5 / PS4",dot:"3424 / 1721",priceMin:2000,priceMax:6500,origin:"",status:"正常",loc:"3D區 → 3D：4條｜米其林 PS5｜DOT 3424 / 3D區 → 3D：1條｜PS4｜DOT 1721",truck:"否"},
-  {spec:"245/50R18",inch:"18吋",zone:"3D",qty:6,brand:"P4 / 防爆",dot:"4224 / 3525",priceMin:8300,priceMax:9500,origin:"",status:"正常",loc:"3D區 → 3D：2條｜米其林 P4｜DOT 4224 / 3D區 → 3D：4條｜米其林 防爆｜DOT 3525",truck:"否"},
-  {spec:"225/40R18",inch:"18吋",zone:"3D",qty:5,brand:"P4+ / PS5",dot:"2023 / 4024",priceMin:4000,priceMax:4500,origin:"",status:"正常",loc:"3D區 → 3D：2條｜米其林 P4+｜DOT 2023 / 3D區 → 3D：3條｜米其林 PS5｜DOT 4024",truck:"否"},
-  {spec:"245/45R18",inch:"18吋",zone:"3D",qty:4,brand:"防爆",dot:"1922",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",loc:"3D區 → 3D：4條｜米其林 防爆｜DOT 1922",truck:"否"},
-  {spec:"235/55R18",inch:"18吋",zone:"3D",qty:22,brand:"EP / P5",dot:"4625 / 4725 / 4123",priceMin:5000,priceMax:5000,origin:"",status:"正常",loc:"3D區 → 3D：1條｜米其林 EP｜DOT 4625 / 3D區 → 3D：9條｜米其林 P5｜DOT 4625 / 3D區 → 3D：8條｜P5｜DOT 4725 / 3D區 → 3D：4條｜EP｜DOT 4123",truck:"否"},
-  {spec:"235/50R18",inch:"18吋",zone:"3D",qty:14,brand:"P5",dot:"1025",priceMin:5800,priceMax:5800,origin:"",status:"正常",loc:"3D區 → 3D：6條｜P5｜DOT 1025 / 3D區 → 3D：8條｜P5｜DOT 1025",truck:"否"},
-  {spec:"225/60R18",inch:"18吋",zone:"3D",qty:29,brand:"P5 / EP / PS4 SUV / SUV+",dot:"0926 / 3925 / 4819 / 4525",priceMin:5200,priceMax:5200,origin:"",status:"正常",loc:"3D區 → 3D：12條｜P5｜DOT 0926 / 3D區 → 3D：4條｜EP｜DOT 3925 / 3D區 → 3D：2條｜PS4 SUV｜DOT 4819 / 3D區 → 3D：11條｜SUV+｜DOT 4525",truck:"否"},
-  {spec:"225/50R18",inch:"18吋",zone:"3D",qty:10,brand:"P5E / EP",dot:"0526 / 5125",priceMin:5200,priceMax:5200,origin:"",status:"正常",loc:"3D區 → 3D：4條｜P5E｜DOT 0526 / 3D區 → 3D：6條｜EP｜DOT 5125",truck:"否"},
-  {spec:"215/50R18",inch:"18吋",zone:"3D",qty:4,brand:"SUV+",dot:"2625",priceMin:5400,priceMax:5400,origin:"",status:"需補貨",loc:"3D區 → 3D：4條｜SUV+｜DOT 2625",truck:"否"},
-  {spec:"235/40R18",inch:"18吋",zone:"3D",qty:4,brand:"P4+",dot:"2825",priceMin:6500,priceMax:6500,origin:"",status:"需補貨",loc:"3D區 → 3D：4條｜P4+｜DOT 2825",truck:"否"},
-  {spec:"225/55R19",inch:"19吋",zone:"4A",qty:9,brand:"SUV+ / PS4",dot:"0126 / 2921",priceMin:3000,priceMax:7200,origin:"",status:"正常",loc:"4A區 → 4A：8條｜米其林 SUV+｜DOT 0126 / 4A區 → 4A：1條｜米其林 PS4｜DOT 2921",truck:"否"},
-  {spec:"235/55R19",inch:"19吋",zone:"4A",qty:16,brand:"PS4 SUV / LS3 / HP / PS4",dot:"5024 / 3625 / 5025 / 0224",priceMin:7000,priceMax:7800,origin:"",status:"正常",loc:"4A區 → 4A：4條｜米其林 PS4 SUV｜DOT 5024 / 4A區 → 4A：4條｜米其林 LS3｜DOT 3625 / 4A區 → 4A：4條｜米其林 HP｜DOT 5025 / 4A區 → 4A：4條｜米其林 PS4｜DOT 0224",truck:"否"},
-  {spec:"235/35R19",inch:"19吋",zone:"4A",qty:1,brand:"PS4",dot:"2019",priceMin:3000,priceMax:3000,origin:"",status:"低庫存",loc:"4A區 → 4A：1條｜米其林 PS4｜DOT 2019",truck:"否"},
-  {spec:"235/50R19",inch:"19吋",zone:"4A",qty:2,brand:"P5",dot:"0426",priceMin:7800,priceMax:7800,origin:"",status:"低庫存",loc:"4A區 → 4A：2條｜米其林 P5｜DOT 0426",truck:"否"},
-  {spec:"235/45R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2825",priceMin:8800,priceMax:8800,origin:"",status:"低庫存",loc:"4A區 → 4A：2條｜米其林 PS5｜DOT 2825",truck:"否"},
-  {spec:"235/55R20",inch:"20吋",zone:"4B",qty:8,brand:"SUV+",dot:"4325",priceMin:8500,priceMax:8500,origin:"",status:"正常",loc:"4B區 → 4B：4條｜米其林 SUV+｜DOT 4325 / 4B區 → 4B：4條｜米其林 SUV+｜DOT 4325",truck:"否"},
-  {spec:"275/50R20",inch:"20吋",zone:"4B",qty:2,brand:"PS4 SUV",dot:"3924",priceMin:10000,priceMax:10000,origin:"",status:"低庫存",loc:"4B區 → 4B：2條｜米其林 PS4 SUV｜DOT 3924",truck:"否"},
-  {spec:"275/35R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2624",priceMin:9500,priceMax:9500,origin:"",status:"低庫存",loc:"4A區 → 4A：2條｜米其林 PS5｜DOT 2624",truck:"否"},
-  {spec:"255/45R19",inch:"19吋",zone:"4A",qty:8,brand:"P5E / EV",dot:"0226 / 3425",priceMin:9500,priceMax:9500,origin:"",status:"正常",loc:"4A區 → 4A：4條｜米其林 P5E｜DOT 0226 / 4A區 → 4A：4條｜米其林 EV｜DOT 3425",truck:"否"},
-  {spec:"245/40R19",inch:"19吋",zone:"4A",qty:6,brand:"PS5 / PS4",dot:"2424 / 4323",priceMin:8300,priceMax:9000,origin:"",status:"正常",loc:"4A區 → 4A：2條｜米其林 PS5｜DOT 2424 / 4A區 → 4A：4條｜米其林 PS4｜DOT 4323",truck:"否"},
-  {spec:"245/50R19",inch:"19吋",zone:"4A",qty:4,brand:"LS3",dot:"2024",priceMin:9800,priceMax:9800,origin:"",status:"需補貨",loc:"4A區 → 4A：4條｜米其林 LS3｜DOT 2024",truck:"否"},
-  {spec:"235/40R19",inch:"19吋",zone:"4A",qty:4,brand:"PS5",dot:"3225",priceMin:8800,priceMax:8800,origin:"",status:"需補貨",loc:"4A區 → 4A：4條｜米其林 PS5｜DOT 3225",truck:"否"},
-  {spec:"255/50R19",inch:"19吋",zone:"4A",qty:4,brand:"PS4 SUV",dot:"2020",priceMin:3000,priceMax:3000,origin:"",status:"需補貨",loc:"4A區 → 4A：4條｜米其林 PS4 SUV｜DOT 2020",truck:"否"},
-  {spec:"195/85R16C",inch:"16吋",zone:"貨車",qty:4,brand:"XJE4",dot:"0826",priceMin:6500,priceMax:6500,origin:"",status:"需補貨",loc:"貨車區 → 貨車：4條｜米其林 XJE4｜DOT 0826",truck:"是"},
-  {spec:"700R15C",inch:"15吋",zone:"貨車",qty:4,brand:"正新",dot:"5225",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",loc:"貨車區 → 貨車：4條｜正新｜DOT 5225",truck:"是"},
-  {spec:"195/75R16C",inch:"16吋",zone:"貨車",qty:32,brand:"CW-25 / AG3",dot:"0626 / 2026 / 4325",priceMin:3500,priceMax:3800,origin:"",status:"正常",loc:"貨車區 → 貨車：2條｜南港 CW-25｜DOT 0626 / 貨車區 → 貨車：20條｜米其林 AG3｜DOT 2026 / 貨車區 → 貨車：10條｜米其林 AG3｜DOT 4325",truck:"是"},
-  {spec:"165R13C",inch:"13吋",zone:"貨車",qty:26,brand:"AG3",dot:"2925",priceMin:2400,priceMax:2400,origin:"",status:"正常",loc:"貨車區 → 貨車：26條｜米其林 AG3｜DOT 2925",truck:"是"},
-  {spec:"175R14C",inch:"14吋",zone:"貨車",qty:10,brand:"CW-25",dot:"1126",priceMin:2600,priceMax:2600,origin:"",status:"正常",loc:"貨車區 → 貨車：10條｜南港 CW-25｜DOT 1126",truck:"是"},
-  {spec:"700R16C",inch:"16吋",zone:"貨車",qty:4,brand:"正新",dot:"1526",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",loc:"貨車區 → 貨車：4條｜正新｜DOT 1526",truck:"是"},
-  {spec:"215/70R16C",inch:"16吋",zone:"貨車",qty:4,brand:"AG3",dot:"3525",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",loc:"貨車區 → 貨車：4條｜米其林 AG3｜DOT 3525",truck:"是"},
-  {spec:"205/65R15C",inch:"15吋",zone:"貨車",qty:6,brand:"AG3",dot:"4823",priceMin:3500,priceMax:3500,origin:"",status:"正常",loc:"貨車區 → 貨車：6條｜米其林 AG3｜DOT 4823",truck:"是"},
-  {spec:"225/55R17C",inch:"17吋",zone:"貨車",qty:4,brand:"AG3",dot:"1623",priceMin:4000,priceMax:4000,origin:"",status:"需補貨",loc:"貨車區 → 貨車：4條｜米其林 AG3｜DOT 1623",truck:"是"},
-  {spec:"195/70R15C",inch:"15吋",zone:"貨車",qty:5,brand:"R-600",dot:"2025",priceMin:3600,priceMax:3600,origin:"",status:"正常",loc:"貨車區 → 貨車：5條｜普利司通 R-600｜DOT 2025",truck:"是"},
-  {spec:"205/75R16C",inch:"16吋",zone:"貨車",qty:5,brand:"R-205 / AG3",dot:"4025 / 0924 / 2425",priceMin:4600,priceMax:5200,origin:"",status:"正常",loc:"貨車區 → 貨車：1條｜普利司通 R-205｜DOT 4025 / 貨車區 → 貨車：1條｜米其林 AG3｜DOT 0924 / 貨車區 → 貨車：3條｜米其林 AG3｜DOT 2425",truck:"是"},
-  {spec:"185R14C",inch:"14吋",zone:"貨車",qty:31,brand:"AG3",dot:"4425",priceMin:3100,priceMax:3100,origin:"",status:"正常",loc:"貨車區 → 貨車：31條｜米其林 AG3｜DOT 4425",truck:"是"},
-  {spec:"165R14C",inch:"14吋",zone:"貨車",qty:2,brand:"CW-25",dot:"",priceMin:2600,priceMax:2600,origin:"",status:"低庫存",loc:"貨車區 → 貨車：2條｜南港 CW-25",truck:"是"},
-  {spec:"155R13C",inch:"13吋",zone:"貨車",qty:14,brand:"CW-25",dot:"0226",priceMin:2000,priceMax:2000,origin:"",status:"正常",loc:"貨車區 → 貨車：14條｜南港 CW-25｜DOT 0226",truck:"是"},
-  {spec:"245/45R19",inch:"19吋",zone:"4A",qty:1,brand:"p-zero",dot:"2022",priceMin:5000,priceMax:5000,origin:"",status:"低庫存",loc:"4A區 → 4A：1條｜米其林 p-zero｜DOT 2022",truck:"否"},
-  {spec:"295/30R22",inch:"22吋",zone:"4B",qty:2,brand:"SC7",dot:"3722",priceMin:5000,priceMax:5000,origin:"",status:"低庫存",loc:"4B區 → 4B：2條｜馬牌 SC7｜DOT 3722",truck:"否"},
-  {spec:"15新內胎",inch:"配件",zone:"配件",qty:12,brand:"不含拆裝工資$400",dot:"",priceMin:800,priceMax:800,origin:"",status:"正常",loc:"店面 配件區 → 配件：12件",truck:"否",grade:"350"},
-  {spec:"16新內胎",inch:"配件",zone:"配件",qty:10,brand:"不含拆裝工資$400",dot:"",priceMin:800,priceMax:800,origin:"",status:"正常",loc:"店面 配件區 → 配件：10件",truck:"否",grade:"350"},
-  {spec:"15新內帶",inch:"配件",zone:"配件",qty:2,brand:"",dot:"",priceMin:300,priceMax:300,origin:"",status:"正常",loc:"店面 配件區 → 配件：2件",truck:"否",grade:"180"},
-  {spec:"16新內帶",inch:"配件",zone:"配件",qty:2,brand:"",dot:"",priceMin:300,priceMax:300,origin:"",status:"正常",loc:"店面 配件區 → 配件：2件",truck:"否",grade:"190"},
-  {spec:"胎壓器",inch:"配件",zone:"配件",qty:2,brand:"太陽牌",dot:"",priceMin:5500,priceMax:5500,origin:"",status:"正常",loc:"店面 配件區 → 配件：2件",truck:"否",grade:"2300"},
-  {spec:"行車紀錄器",inch:"配件",zone:"配件",qty:2,brand:"AR-770新款",dot:"",priceMin:7800,priceMax:7800,origin:"",status:"正常",loc:"店面 配件區 → 配件：2件",truck:"否",grade:"3300"},
+  {spec:"175/65R14",inch:"14吋",zone:"3A",qty:6,brand:"SA4",dot:"0226",priceMin:2600,priceMax:2600,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0226",qty:6,price:2600,origin:""}]},
+  {spec:"185/60R14",inch:"14吋",zone:"3A",qty:9,brand:"XM2",dot:"2025 / 0926 / 1624",priceMin:2700,priceMax:2700,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"XM2",dot:"2025",qty:4,price:2700,origin:""},{mfr:"米其林",model:"XM2",dot:"0926",qty:4,price:2700,origin:""},{mfr:"米其林",model:"XM2",dot:"1624",qty:1,price:2700,origin:""}]},
+  {spec:"185/65R14",inch:"14吋",zone:"3A",qty:5,brand:"SA4",dot:"5125 / 3523",priceMin:2700,priceMax:2700,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"5125",qty:4,price:2700,origin:""},{mfr:"米其林",model:"SA4",dot:"3523",qty:1,price:2700,origin:""}]},
+  {spec:"185/55R15",inch:"15吋",zone:"3A",qty:7,brand:"PS3",dot:"2124",priceMin:3200,priceMax:3200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS3",dot:"2124",qty:7,price:3200,origin:""}]},
+  {spec:"195/55R15",inch:"15吋",zone:"3A",qty:4,brand:"SA4",dot:"4825",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"4825",qty:4,price:3200,origin:""}]},
+  {spec:"205/65R15",inch:"15吋",zone:"3A",qty:3,brand:"SA4",dot:"0826",priceMin:3200,priceMax:3200,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0826",qty:3,price:3200,origin:""}]},
+  {spec:"205/70R15",inch:"15吋",zone:"3A",qty:10,brand:"SUV+ / SP-9",dot:"0625 / 3525",priceMin:2900,priceMax:3800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"0625",qty:6,price:3800,origin:""},{mfr:"南港",model:"SP-9",dot:"3525",qty:4,price:2900,origin:""}]},
+  {spec:"205/60R16",inch:"16吋",zone:"3B",qty:15,brand:"P5 / P4+ / XM2",dot:"4925 / 2823 / 3025 / 2023",priceMin:3000,priceMax:3800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4925",qty:8,price:3800,origin:""},{mfr:"米其林",model:"P4+",dot:"2823",qty:3,price:3000,origin:""},{mfr:"米其林",model:"XM2",dot:"3025",qty:3,price:3600,origin:""},{mfr:"米其林",model:"XM2",dot:"2023",qty:1,price:3600,origin:""}]},
+  {spec:"195/50R15",inch:"15吋",zone:"3A",qty:2,brand:"P4+",dot:"0322*2",priceMin:2000,priceMax:2000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"0322*2",qty:2,price:2000,origin:""}]},
+  {spec:"195/55R16",inch:"16吋",zone:"3B",qty:14,brand:"P4+ / TURANZA6 / P3 / P5",dot:"1520 / 1525 / 4922 / 3225",priceMin:2000,priceMax:4000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"1520",qty:2,price:2000,origin:""},{mfr:"普利司通",model:"TURANZA6",dot:"1525",qty:4,price:3500,origin:""},{mfr:"米其林",model:"P3",dot:"4922",qty:4,price:3000,origin:""},{mfr:"米其林",model:"P5",dot:"3225",qty:4,price:4000,origin:""}]},
+  {spec:"185/55R16",inch:"16吋",zone:"3B",qty:6,brand:"SA4 / NH-100",dot:"0626 / 3625 / 4225",priceMin:2300,priceMax:3800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0626",qty:3,price:3800,origin:""},{mfr:"米其林",model:"SA4",dot:"3625",qty:1,price:3800,origin:""},{mfr:"普利司通",model:"NH-100",dot:"4225",qty:2,price:2300,origin:""}]},
+  {spec:"195/65R15",inch:"15吋",zone:"3A",qty:20,brand:"SX-608 / P4 / SA4",dot:"4225 / 4025 / 3025",priceMin:2500,priceMax:3200,origin:"",status:"正常",truck:"否",batches:[{mfr:"南港",model:"SX-608",dot:"4225",qty:4,price:2500,origin:""},{mfr:"米其林",model:"P4",dot:"4025",qty:6,price:3200,origin:""},{mfr:"米其林",model:"SA4",dot:"3025",qty:10,price:3200,origin:""}]},
+  {spec:"195/50R16",inch:"16吋",zone:"3B",qty:2,brand:"ER-33",dot:"4225",priceMin:3200,priceMax:3200,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"普利司通",model:"ER-33",dot:"4225",qty:2,price:3200,origin:""}]},
+  {spec:"185/60R15",inch:"15吋",zone:"3A",qty:12,brand:"P4 / XM2",dot:"2025 / 2024 / 2023 / 2624",priceMin:3000,priceMax:3000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"2025",qty:1,price:3000,origin:""},{mfr:"米其林",model:"P4",dot:"2024",qty:2,price:3000,origin:""},{mfr:"米其林",model:"P4",dot:"2023",qty:1,price:3000,origin:""},{mfr:"米其林",model:"XM2",dot:"2624",qty:8,price:3000,origin:""}]},
+  {spec:"185/65R15",inch:"15吋",zone:"3A",qty:18,brand:"P4 / SA4",dot:"3425 / 1124",priceMin:3000,priceMax:3000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"3425",qty:8,price:3000,origin:""},{mfr:"米其林",model:"SA4",dot:"1124",qty:10,price:3000,origin:""}]},
+  {spec:"195/60R16",inch:"16吋",zone:"3B",qty:2,brand:"P4+",dot:"2024",priceMin:3400,priceMax:3400,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"2024",qty:2,price:3400,origin:""}]},
+  {spec:"215/65R16",inch:"16吋",zone:"3B",qty:4,brand:"P5",dot:"3425",priceMin:4300,priceMax:4300,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"3425",qty:4,price:4300,origin:""}]},
+  {spec:"215/70R16",inch:"16吋",zone:"3B",qty:4,brand:"SUV+",dot:"3025",priceMin:4300,priceMax:4300,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"3025",qty:4,price:4300,origin:""}]},
+  {spec:"205/55R16",inch:"16吋",zone:"3B",qty:16,brand:"SA4 / P5",dot:"0426 / 1326",priceMin:3600,priceMax:3600,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SA4",dot:"0426",qty:8,price:3600,origin:""},{mfr:"米其林",model:"P5",dot:"1326",qty:8,price:3600,origin:""}]},
+  {spec:"215/60R16",inch:"16吋",zone:"3B",qty:18,brand:"P4+ / P4 / UC7",dot:"3824 / 1123 / 2624",priceMin:3000,priceMax:3500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"3824",qty:13,price:3500,origin:""},{mfr:"米其林",model:"P4",dot:"1123",qty:1,price:3000,origin:""},{mfr:"馬牌",model:"UC7",dot:"2624",qty:4,price:3500,origin:""}]},
+  {spec:"225/45R17",inch:"17吋",zone:"3C",qty:19,brand:"P5 / PS4 / P4+ / PS5",dot:"4825 / 3421 / 4324 / 2624",priceMin:1000,priceMax:4300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4825",qty:4,price:4300,origin:""},{mfr:"米其林",model:"P5",dot:"4825",qty:6,price:4300,origin:""},{mfr:"米其林",model:"PS4",dot:"3421",qty:1,price:1000,origin:""},{mfr:"米其林",model:"P4+",dot:"4324",qty:4,price:4200,origin:""},{mfr:"米其林",model:"PS5",dot:"2624",qty:4,price:4000,origin:""}]},
+  {spec:"235/55R17",inch:"17吋",zone:"3C",qty:9,brand:"P3 / P4+",dot:"2917 / 2523",priceMin:3000,priceMax:3000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P3",dot:"2917",qty:4,price:0,origin:""},{mfr:"米其林",model:"P4+",dot:"2523",qty:5,price:3000,origin:""}]},
+  {spec:"235/60R18",inch:"18吋",zone:"3D",qty:21,brand:"HP / SUV+ / EP / P5 / SUV",dot:"3824 / 4725 / 1721 / 4125 / 0926 / 4121",priceMin:1000,priceMax:5300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"HP",dot:"3824",qty:5,price:5200,origin:""},{mfr:"",model:"SUV+",dot:"4725",qty:3,price:5300,origin:""},{mfr:"",model:"EP",dot:"1721",qty:2,price:1000,origin:""},{mfr:"",model:"EP",dot:"4125",qty:4,price:5300,origin:""},{mfr:"",model:"P5",dot:"0926",qty:6,price:5300,origin:""},{mfr:"",model:"SUV",dot:"4121",qty:1,price:1000,origin:""}]},
+  {spec:"215/55R18",inch:"18吋",zone:"3D",qty:4,brand:"EP",dot:"3923",priceMin:4000,priceMax:4000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"EP",dot:"3923",qty:4,price:4000,origin:""}]},
+  {spec:"215/45R18",inch:"18吋",zone:"3D",qty:8,brand:"P4+ / PS5",dot:"2523 / 3523",priceMin:4000,priceMax:4000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"2523",qty:4,price:4000,origin:""},{mfr:"米其林",model:"PS5",dot:"3523",qty:4,price:4000,origin:""}]},
+  {spec:"215/60R17",inch:"17吋",zone:"3C",qty:15,brand:"ALENZA / P5",dot:"2425 / 3125",priceMin:4000,priceMax:4000,origin:"",status:"正常",truck:"否",batches:[{mfr:"普利司通",model:"ALENZA",dot:"2425",qty:8,price:4000,origin:""},{mfr:"米其林",model:"P5",dot:"3125",qty:7,price:4000,origin:""}]},
+  {spec:"215/45R17",inch:"17吋",zone:"3C",qty:9,brand:"P5 / PS5",dot:"5225 / 1425",priceMin:4200,priceMax:4200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"5225",qty:6,price:4200,origin:""},{mfr:"米其林",model:"PS5",dot:"1425",qty:3,price:4200,origin:""}]},
+  {spec:"245/45R17",inch:"17吋",zone:"3C",qty:11,brand:"P4+ / 防爆 / P4 / P5 / PS4",dot:"5123 / 4821 / 2125 / 2024",priceMin:2000,priceMax:5500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"5123",qty:2,price:3000,origin:""},{mfr:"米其林",model:"防爆",dot:"",qty:1,price:3000,origin:""},{mfr:"米其林",model:"P4",dot:"4821",qty:1,price:2000,origin:""},{mfr:"米其林",model:"P5",dot:"2125",qty:4,price:5500,origin:""},{mfr:"米其林",model:"PS4",dot:"2024",qty:3,price:2500,origin:""}]},
+  {spec:"205/55R17",inch:"17吋",zone:"3C",qty:4,brand:"P5",dot:"3525",priceMin:4500,priceMax:4500,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"3525",qty:4,price:4500,origin:""}]},
+  {spec:"225/50R17",inch:"17吋",zone:"3C",qty:3,brand:"P4 / P4+",dot:"3423 / 2023",priceMin:3000,priceMax:3000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"3423",qty:1,price:3000,origin:""},{mfr:"米其林",model:"P4+",dot:"2023",qty:2,price:3000,origin:""}]},
+  {spec:"225/60R17",inch:"17吋",zone:"3C",qty:9,brand:"P5 / P4+",dot:"4125 / 3525 / 3124",priceMin:4300,priceMax:5200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4125",qty:4,price:5200,origin:""},{mfr:"米其林",model:"P5",dot:"3525",qty:4,price:4300,origin:""},{mfr:"米其林",model:"P4+",dot:"3124",qty:1,price:4300,origin:""}]},
+  {spec:"225/65R17",inch:"17吋",zone:"3C",qty:31,brand:"P5 / EP / HP / SUV+ / SUV / PS4 SUV",dot:"0526 / 4423 / 2024 / 2023 / 3821 / 2925 / 5023 / 2623",priceMin:1000,priceMax:4500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"0526",qty:17,price:4500,origin:""},{mfr:"米其林",model:"P5",dot:"4423",qty:2,price:4500,origin:""},{mfr:"米其林",model:"EP",dot:"2024",qty:2,price:4500,origin:""},{mfr:"米其林",model:"EP",dot:"2023",qty:3,price:4500,origin:""},{mfr:"米其林",model:"HP",dot:"3821",qty:2,price:1000,origin:""},{mfr:"米其林",model:"SUV+",dot:"2925",qty:2,price:4500,origin:""},{mfr:"米其林",model:"EP",dot:"5023",qty:1,price:4000,origin:""},{mfr:"米其林",model:"SUV",dot:"",qty:1,price:4000,origin:""},{mfr:"米其林",model:"PS4 SUV",dot:"2623",qty:1,price:4000,origin:""}]},
+  {spec:"235/45R18",inch:"18吋",zone:"3D",qty:16,brand:"EP / P5E / PS5",dot:"4724 / 1026 / 1125",priceMin:4500,priceMax:6200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"EP",dot:"4724",qty:4,price:4500,origin:""},{mfr:"米其林",model:"P5E",dot:"1026",qty:4,price:4500,origin:""},{mfr:"米其林",model:"P5E",dot:"1026",qty:4,price:4500,origin:""},{mfr:"米其林",model:"PS5",dot:"1125",qty:4,price:6200,origin:""}]},
+  {spec:"225/55R18",inch:"18吋",zone:"3D",qty:10,brand:"UC7 / SUV+",dot:"4924 / 4124",priceMin:4800,priceMax:5000,origin:"",status:"正常",truck:"否",batches:[{mfr:"馬牌",model:"UC7",dot:"4924",qty:6,price:5000,origin:""},{mfr:"",model:"SUV+",dot:"4124",qty:4,price:4800,origin:""}]},
+  {spec:"215/55R17",inch:"17吋",zone:"3C",qty:19,brand:"P5 / PS5",dot:"0126 / 4223",priceMin:3500,priceMax:4300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"0126",qty:10,price:4300,origin:""},{mfr:"米其林",model:"PS5",dot:"4223",qty:4,price:3500,origin:""},{mfr:"米其林",model:"P5",dot:"0126",qty:5,price:4300,origin:""}]},
+  {spec:"225/55R17",inch:"17吋",zone:"3C",qty:7,brand:"P3 / P5 / P4+",dot:"2125 / 2024",priceMin:5000,priceMax:5300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P3",dot:"2125",qty:2,price:5300,origin:""},{mfr:"米其林",model:"P5",dot:"2125",qty:4,price:5300,origin:""},{mfr:"米其林",model:"P4+",dot:"2024",qty:1,price:5000,origin:""}]},
+  {spec:"225/45R18",inch:"18吋",zone:"3D",qty:14,brand:"P5 / PS5 / PS4",dot:"4924 / 3724",priceMin:5000,priceMax:5300,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"4924",qty:5,price:5000,origin:""},{mfr:"米其林",model:"PS5",dot:"3724",qty:8,price:5200,origin:""},{mfr:"米其林",model:"PS4",dot:"",qty:1,price:5300,origin:""}]},
+  {spec:"245/40R18",inch:"18吋",zone:"3D",qty:5,brand:"PS5 / PS4",dot:"3424 / 1721",priceMin:2000,priceMax:6500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"3424",qty:4,price:6500,origin:""},{mfr:"",model:"PS4",dot:"1721",qty:1,price:2000,origin:""}]},
+  {spec:"245/50R18",inch:"18吋",zone:"3D",qty:6,brand:"P4 / 防爆",dot:"4224 / 3525",priceMin:8300,priceMax:9500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4",dot:"4224",qty:2,price:8300,origin:""},{mfr:"米其林",model:"防爆",dot:"3525",qty:4,price:9500,origin:""}]},
+  {spec:"225/40R18",inch:"18吋",zone:"3D",qty:5,brand:"P4+ / PS5",dot:"2023 / 4024",priceMin:4000,priceMax:4500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P4+",dot:"2023",qty:2,price:4500,origin:""},{mfr:"米其林",model:"PS5",dot:"4024",qty:3,price:4000,origin:""}]},
+  {spec:"245/45R18",inch:"18吋",zone:"3D",qty:4,brand:"防爆",dot:"1922",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"防爆",dot:"1922",qty:4,price:5000,origin:""}]},
+  {spec:"235/55R18",inch:"18吋",zone:"3D",qty:22,brand:"EP / P5",dot:"4625 / 4725 / 4123",priceMin:5000,priceMax:5000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"EP",dot:"4625",qty:1,price:5000,origin:""},{mfr:"米其林",model:"P5",dot:"4625",qty:9,price:5000,origin:""},{mfr:"",model:"P5",dot:"4725",qty:8,price:5000,origin:""},{mfr:"",model:"EP",dot:"4123",qty:4,price:5000,origin:""}]},
+  {spec:"235/50R18",inch:"18吋",zone:"3D",qty:14,brand:"P5",dot:"1025",priceMin:5800,priceMax:5800,origin:"",status:"正常",truck:"否",batches:[{mfr:"",model:"P5",dot:"1025",qty:6,price:5800,origin:""},{mfr:"",model:"P5",dot:"1025",qty:8,price:5800,origin:""}]},
+  {spec:"225/60R18",inch:"18吋",zone:"3D",qty:29,brand:"P5 / EP / PS4 SUV / SUV+",dot:"0926 / 3925 / 4819 / 4525",priceMin:5200,priceMax:5200,origin:"",status:"正常",truck:"否",batches:[{mfr:"",model:"P5",dot:"0926",qty:12,price:5200,origin:""},{mfr:"",model:"EP",dot:"3925",qty:4,price:5200,origin:""},{mfr:"",model:"PS4 SUV",dot:"4819",qty:2,price:5200,origin:""},{mfr:"",model:"SUV+",dot:"4525",qty:11,price:5200,origin:""}]},
+  {spec:"225/50R18",inch:"18吋",zone:"3D",qty:10,brand:"P5E / EP",dot:"0526 / 5125",priceMin:5200,priceMax:5200,origin:"",status:"正常",truck:"否",batches:[{mfr:"",model:"P5E",dot:"0526",qty:4,price:5200,origin:""},{mfr:"",model:"EP",dot:"5125",qty:6,price:5200,origin:""}]},
+  {spec:"215/50R18",inch:"18吋",zone:"3D",qty:4,brand:"SUV+",dot:"2625",priceMin:5400,priceMax:5400,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"",model:"SUV+",dot:"2625",qty:4,price:5400,origin:""}]},
+  {spec:"235/40R18",inch:"18吋",zone:"3D",qty:4,brand:"P4+",dot:"2825",priceMin:6500,priceMax:6500,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"",model:"P4+",dot:"2825",qty:4,price:6500,origin:""}]},
+  {spec:"225/55R19",inch:"19吋",zone:"4A",qty:9,brand:"SUV+ / PS4",dot:"0126 / 2921",priceMin:3000,priceMax:7200,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"0126",qty:8,price:7200,origin:""},{mfr:"米其林",model:"PS4",dot:"2921",qty:1,price:3000,origin:""}]},
+  {spec:"235/55R19",inch:"19吋",zone:"4A",qty:16,brand:"PS4 SUV / LS3 / HP / PS4",dot:"5024 / 3625 / 5025 / 0224",priceMin:7000,priceMax:7800,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS4 SUV",dot:"5024",qty:4,price:7000,origin:""},{mfr:"米其林",model:"LS3",dot:"3625",qty:4,price:7800,origin:""},{mfr:"米其林",model:"HP",dot:"5025",qty:4,price:7800,origin:""},{mfr:"米其林",model:"PS4",dot:"0224",qty:4,price:7000,origin:""}]},
+  {spec:"235/35R19",inch:"19吋",zone:"4A",qty:1,brand:"PS4",dot:"2019",priceMin:3000,priceMax:3000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS4",dot:"2019",qty:1,price:3000,origin:""}]},
+  {spec:"235/50R19",inch:"19吋",zone:"4A",qty:2,brand:"P5",dot:"0426",priceMin:7800,priceMax:7800,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"P5",dot:"0426",qty:2,price:7800,origin:""}]},
+  {spec:"235/45R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2825",priceMin:8800,priceMax:8800,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"2825",qty:2,price:8800,origin:""}]},
+  {spec:"235/55R20",inch:"20吋",zone:"4B",qty:8,brand:"SUV+",dot:"4325",priceMin:8500,priceMax:8500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"SUV+",dot:"4325",qty:4,price:8500,origin:""},{mfr:"米其林",model:"SUV+",dot:"4325",qty:4,price:8500,origin:""}]},
+  {spec:"275/50R20",inch:"20吋",zone:"4B",qty:2,brand:"PS4 SUV",dot:"3924",priceMin:10000,priceMax:10000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS4 SUV",dot:"3924",qty:2,price:10000,origin:""}]},
+  {spec:"275/35R19",inch:"19吋",zone:"4A",qty:2,brand:"PS5",dot:"2624",priceMin:9500,priceMax:9500,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"2624",qty:2,price:9500,origin:""}]},
+  {spec:"255/45R19",inch:"19吋",zone:"4A",qty:8,brand:"P5E / EV",dot:"0226 / 3425",priceMin:9500,priceMax:9500,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"P5E",dot:"0226",qty:4,price:9500,origin:""},{mfr:"米其林",model:"EV",dot:"3425",qty:4,price:9500,origin:""}]},
+  {spec:"245/40R19",inch:"19吋",zone:"4A",qty:6,brand:"PS5 / PS4",dot:"2424 / 4323",priceMin:8300,priceMax:9000,origin:"",status:"正常",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"2424",qty:2,price:8300,origin:""},{mfr:"米其林",model:"PS4",dot:"4323",qty:4,price:9000,origin:""}]},
+  {spec:"245/50R19",inch:"19吋",zone:"4A",qty:4,brand:"LS3",dot:"2024",priceMin:9800,priceMax:9800,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"LS3",dot:"2024",qty:4,price:9800,origin:""}]},
+  {spec:"235/40R19",inch:"19吋",zone:"4A",qty:4,brand:"PS5",dot:"3225",priceMin:8800,priceMax:8800,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"PS5",dot:"3225",qty:4,price:8800,origin:""}]},
+  {spec:"255/50R19",inch:"19吋",zone:"4A",qty:4,brand:"PS4 SUV",dot:"2020",priceMin:3000,priceMax:3000,origin:"",status:"需補貨",truck:"否",batches:[{mfr:"米其林",model:"PS4 SUV",dot:"2020",qty:4,price:3000,origin:""}]},
+  {spec:"245/45R19",inch:"19吋",zone:"4A",qty:1,brand:"p-zero",dot:"2022",priceMin:5000,priceMax:5000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"米其林",model:"p-zero",dot:"2022",qty:1,price:5000,origin:""}]},
+  {spec:"295/30R22",inch:"22吋",zone:"4B",qty:2,brand:"SC7",dot:"3722",priceMin:5000,priceMax:5000,origin:"",status:"低庫存",truck:"否",batches:[{mfr:"馬牌",model:"SC7",dot:"3722",qty:2,price:5000,origin:""}]},
+  {spec:"195/85R16C",inch:"16吋",zone:"貨車",qty:4,brand:"XJE4",dot:"0826",priceMin:6500,priceMax:6500,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"米其林",model:"XJE4",dot:"0826",qty:4,price:6500,origin:""}]},
+  {spec:"700R15C",inch:"15吋",zone:"貨車",qty:4,brand:"正新",dot:"5225",priceMin:5000,priceMax:5000,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"",model:"正新",dot:"5225",qty:4,price:5000,origin:""}]},
+  {spec:"195/75R16C",inch:"16吋",zone:"貨車",qty:32,brand:"CW-25 / AG3",dot:"0626 / 2026 / 4325",priceMin:3500,priceMax:3800,origin:"",status:"正常",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"0626",qty:2,price:3500,origin:""},{mfr:"米其林",model:"AG3",dot:"2026",qty:20,price:3800,origin:""},{mfr:"米其林",model:"AG3",dot:"4325",qty:10,price:3800,origin:""}]},
+  {spec:"165R13C",inch:"13吋",zone:"貨車",qty:26,brand:"AG3",dot:"2925",priceMin:2400,priceMax:2400,origin:"",status:"正常",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"2925",qty:26,price:2400,origin:""}]},
+  {spec:"175R14C",inch:"14吋",zone:"貨車",qty:10,brand:"CW-25",dot:"1126",priceMin:2600,priceMax:2600,origin:"",status:"正常",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"1126",qty:10,price:2600,origin:""}]},
+  {spec:"700R16C",inch:"16吋",zone:"貨車",qty:4,brand:"正新",dot:"1526",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"",model:"正新",dot:"1526",qty:4,price:5200,origin:""}]},
+  {spec:"215/70R16C",inch:"16吋",zone:"貨車",qty:4,brand:"AG3",dot:"3525",priceMin:5200,priceMax:5200,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"3525",qty:4,price:5200,origin:""}]},
+  {spec:"205/65R15C",inch:"15吋",zone:"貨車",qty:6,brand:"AG3",dot:"4823",priceMin:3500,priceMax:3500,origin:"",status:"正常",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"4823",qty:6,price:3500,origin:""}]},
+  {spec:"225/55R17C",inch:"17吋",zone:"貨車",qty:4,brand:"AG3",dot:"1623",priceMin:4000,priceMax:4000,origin:"",status:"需補貨",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"1623",qty:4,price:4000,origin:""}]},
+  {spec:"195/70R15C",inch:"15吋",zone:"貨車",qty:5,brand:"R-600",dot:"2025",priceMin:3600,priceMax:3600,origin:"",status:"正常",truck:"是",batches:[{mfr:"普利司通",model:"R-600",dot:"2025",qty:5,price:3600,origin:""}]},
+  {spec:"205/75R16C",inch:"16吋",zone:"貨車",qty:5,brand:"R-205 / AG3",dot:"4025 / 0924 / 2425",priceMin:4600,priceMax:5200,origin:"",status:"正常",truck:"是",batches:[{mfr:"普利司通",model:"R-205",dot:"4025",qty:1,price:4600,origin:""},{mfr:"米其林",model:"AG3",dot:"0924",qty:1,price:5200,origin:""},{mfr:"米其林",model:"AG3",dot:"2425",qty:3,price:5200,origin:""}]},
+  {spec:"185R14C",inch:"14吋",zone:"貨車",qty:31,brand:"AG3",dot:"4425",priceMin:3100,priceMax:3100,origin:"",status:"正常",truck:"是",batches:[{mfr:"米其林",model:"AG3",dot:"4425",qty:31,price:3100,origin:""}]},
+  {spec:"165R14C",inch:"14吋",zone:"貨車",qty:2,brand:"CW-25",dot:"",priceMin:2600,priceMax:2600,origin:"",status:"低庫存",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"",qty:2,price:2600,origin:""}]},
+  {spec:"155R13C",inch:"13吋",zone:"貨車",qty:14,brand:"CW-25",dot:"0226",priceMin:2000,priceMax:2000,origin:"",status:"正常",truck:"是",batches:[{mfr:"南港",model:"CW-25",dot:"0226",qty:14,price:2000,origin:""}]},
+  {spec:"15新內胎",inch:"配件",zone:"配件",qty:12,brand:"不含拆裝工資$400",dot:"",priceMin:800,priceMax:800,origin:"",status:"正常",truck:"否",grade:"350",batches:[{mfr:"",model:"不含拆裝工資$400",dot:"",qty:12,price:800,origin:""}]},
+  {spec:"16新內胎",inch:"配件",zone:"配件",qty:10,brand:"不含拆裝工資$400",dot:"",priceMin:800,priceMax:800,origin:"",status:"正常",truck:"否",grade:"350",batches:[{mfr:"",model:"不含拆裝工資$400",dot:"",qty:10,price:800,origin:""}]},
+  {spec:"15新內帶",inch:"配件",zone:"配件",qty:2,brand:"",dot:"",priceMin:300,priceMax:300,origin:"",status:"低庫存",truck:"否",grade:"180",batches:[{mfr:"",model:"",dot:"",qty:2,price:300,origin:""}]},
+  {spec:"16新內帶",inch:"配件",zone:"配件",qty:2,brand:"",dot:"",priceMin:300,priceMax:300,origin:"",status:"低庫存",truck:"否",grade:"190",batches:[{mfr:"",model:"",dot:"",qty:2,price:300,origin:""}]},
+  {spec:"胎壓器",inch:"配件",zone:"配件",qty:2,brand:"太陽牌",dot:"",priceMin:5500,priceMax:5500,origin:"",status:"低庫存",truck:"否",grade:"2300",batches:[{mfr:"",model:"太陽牌",dot:"",qty:2,price:5500,origin:""}]},
+  {spec:"行車紀錄器",inch:"配件",zone:"配件",qty:2,brand:"AR-770新款",dot:"",priceMin:7800,priceMax:7800,origin:"",status:"低庫存",truck:"否",grade:"3300",batches:[{mfr:"",model:"AR-770新款",dot:"",qty:2,price:7800,origin:""}]},
 ];
 
 const ZONES_INFO = {
@@ -1355,6 +1353,29 @@ function pillClass(status) {
   if (status === '正常') return 'pill-ok';
   if (status === '低庫存') return 'pill-warn';
   return 'pill-low';
+}
+
+// 價格格式化
+function fmtPrice(n) { return n ? 'NT$' + Number(n).toLocaleString() : '未標價'; }
+
+// 依 batches 重算品項的合計數量、報價範圍、型號/DOT/產地、狀態
+function recomputeItem(t) {
+  const b = t.batches || [];
+  t.qty = b.reduce((s,x)=>s+(parseInt(x.qty)||0), 0);
+  const prices = b.map(x=>parseInt(x.price)||0).filter(p=>p>0);
+  t.priceMin = prices.length ? Math.min(...prices) : 0;
+  t.priceMax = prices.length ? Math.max(...prices) : 0;
+  const models=[], dots=[], origins=[];
+  b.forEach(x=>{
+    if (x.model && !models.includes(x.model)) models.push(x.model);
+    if (x.dot && !dots.includes(x.dot)) dots.push(x.dot);
+    if (x.origin && !origins.includes(x.origin)) origins.push(x.origin);
+  });
+  t.brand = models.join(' / ');
+  t.dot = dots.join(' / ');
+  t.origin = origins.join(' / ');
+  t.status = statusFor(t);
+  return t;
 }
 
 // 配件類不適用輪胎的低庫存門檻（≤2/≤4），只在歸零時提示補貨
@@ -1495,64 +1516,26 @@ function showResultCard(t) {
   document.getElementById('res-zone').textContent = t.zone + ' (' + (ZONES_INFO[t.zone]?.floor||'') + ')';
   document.getElementById('res-brand').textContent = t.brand||'—';
   document.getElementById('res-dot').textContent = t.dot||'—';
-  const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
-    ? `NT$ ${t.priceMin.toLocaleString()}`
-    : (t.priceMin || t.priceMax ? `NT$ ${(t.priceMin||0).toLocaleString()} – ${(t.priceMax||0).toLocaleString()}` : '未標價');
-  document.getElementById('res-price').textContent = priceStr;
+  // 頂部顯示型號數，實際價格逐筆列在下方明細
+  document.getElementById('res-price').textContent = (t.batches||[]).length + ' 個型號（價格見下方）';
   document.getElementById('res-origin').textContent = t.origin||'—';
   const badge = document.getElementById('res-badge');
   badge.textContent = t.status;
   badge.className = 'result-badge ' + (t.status==='正常'?'badge-ok':t.status==='低庫存'?'badge-low':'badge-warn');
 
-  // Parse locations（多型號時，各位置分別標示型號/DOT）
-  const locs = t.loc ? t.loc.split(' / ') : [];
-  const brandTokens = (t.brand||'').split(' / ').filter(Boolean);
-  const dotTokens = (t.dot||'').split(' / ').filter(Boolean);
-  const pairBrand = brandTokens.length > 1 && brandTokens.length === locs.length;
-  const pairDot = dotTokens.length > 1 && dotTokens.length === locs.length;
-
-  // 無法對應各位置時，型號明細只列一次（不在每個位置重複）
-  let breakdownHtml = '';
-  if (brandTokens.length > 1 && !pairBrand) {
-    const dotPaired = dotTokens.length === brandTokens.length;
-    breakdownHtml = `<div class="location-item">
-      <div class="loc-info">
-        <div class="loc-name" style="color:var(--text-secondary)">型號明細</div>
-        ${brandTokens.map((b, j) => `<div class="loc-model">${b}${dotPaired ? '　DOT ' + dotTokens[j] : ''}</div>`).join('')}
-      </div>
-    </div>`;
-  }
-
-  const locHtml = locs.length ? breakdownHtml + locs.map((l, i) => {
-    // 新格式：位置｜型號｜DOT xxxx
-    const segs = l.split('｜');
-    const main = segs[0];
-    const extras = segs.slice(1);
-    const parts = main.split(' → ');
-    const place = parts[0]||main;
-    const detail = parts[1]||'';
-    const countMatch = detail.match(/：(\d+)(條|件)/);
-    const count = countMatch ? countMatch[1] : '';
-
-    // 只有確定對應時才標在位置上：新進貨記錄的型號，或型號數=位置數依序配對
-    let modelLines = [];
-    if (extras.length) {
-      modelLines = [extras.join('　')];
-    } else if (pairBrand) {
-      modelLines = [brandTokens[i] + (pairDot ? '　DOT ' + dotTokens[i] : '')];
-    }
-
+  // 逐批次列出：品牌型號 · DOT · 各自價格 · 數量
+  const batches = t.batches || [];
+  document.getElementById('res-locations').innerHTML = batches.length ? batches.map(b => {
+    const label = ((b.mfr||'') + ' ' + (b.model||'')).trim() || '—';
     return `<div class="location-item">
       <div class="loc-info">
-        <div class="loc-name">${place}</div>
-        ${detail ? `<div class="loc-detail">${detail}</div>` : ''}
-        ${modelLines.map(m => `<div class="loc-model">型號：${m}</div>`).join('')}
+        <div class="loc-name">${label}</div>
+        <div class="loc-detail">DOT ${b.dot||'—'}${b.origin ? '　·　產地 '+b.origin : ''}</div>
+        <div class="loc-price">報價 ${fmtPrice(b.price)}</div>
       </div>
-      ${count ? `<div class="loc-count">${count}</div>` : ''}
+      <div class="loc-count">${b.qty}<span style="font-size:11px;color:var(--text-muted);font-weight:400"> 條</span></div>
     </div>`;
-  }).join('') : '<div style="color:var(--text-muted);font-size:13px;padding:8px">無位置資料</div>';
-
-  document.getElementById('res-locations').innerHTML = locHtml;
+  }).join('') : '<div style="color:var(--text-muted);font-size:13px;padding:8px">無批次資料</div>';
   card.classList.add('show');
   card.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1593,28 +1576,22 @@ function addInventory() {
   const normSpec = spec.toUpperCase().replace(/\s/g,'');
   const inch = guessInch(normSpec);
 
-  // 位置明細附帶型號/DOT（型號中的 / 換成 ·，避免與位置分隔符衝突）
-  const brandTag = brand ? '｜' + brand.replace(/\s*\/\s*/g, '·') : '';
-  const dotTag = dot ? '｜DOT ' + dot : '';
-  const locSeg = location ? `${floor} ${location} → ${zone}：${qty}條${brandTag}${dotTag}` : '';
+  // 此次進貨建立一個批次（型號/DOT/數量/價格各自獨立）
+  const newBatch = {mfr:'', model:brand, dot, qty, price, origin};
 
   const existing = inventory.find(t => t.spec.toUpperCase() === normSpec);
   if (existing) {
-    existing.qty += qty;
-    if (locSeg) existing.loc += (existing.loc ? ' / ' : '') + locSeg;
-    // 型號/DOT 不同時，合併記錄到品項
-    if (brand && !(existing.brand||'').split(' / ').includes(brand)) {
-      existing.brand = existing.brand ? existing.brand + ' / ' + brand : brand;
-    }
-    if (dot && !(existing.dot||'').split(' / ').includes(dot)) {
-      existing.dot = existing.dot ? existing.dot + ' / ' + dot : dot;
-    }
-    existing.status = statusFor(existing);
+    if (!existing.batches) existing.batches = [];
+    // 同型號同DOT同價格 → 累加數量；否則新增一筆批次
+    const same = existing.batches.find(b => (b.model||'')===brand && (b.dot||'')===dot && (parseInt(b.price)||0)===price);
+    if (same) same.qty = (parseInt(same.qty)||0) + qty;
+    else existing.batches.push(newBatch);
+    recomputeItem(existing);
     showToast(`✅ 已更新 ${normSpec} 庫存，進貨 ${qty} 條`);
   } else {
     const newItem = {
       spec: normSpec, inch, zone, qty, brand, dot, priceMin: price, priceMax: price,
-      origin, status: '', loc: locSeg, truck
+      origin, status: '', truck, batches: [newBatch]
     };
     newItem.status = statusFor(newItem);
     inventory.push(newItem);
@@ -1715,6 +1692,7 @@ function openZoneDetail(zone) {
     const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
       ? `$${t.priceMin.toLocaleString()}`
       : (t.priceMin||t.priceMax ? `$${(t.priceMin||0).toLocaleString()}~${(t.priceMax||0).toLocaleString()}` : '—');
+    const batchSummary = (t.batches||[]).map(b => `${((b.mfr||'')+' '+(b.model||'')).trim()||'—'} ${b.qty}條 ${fmtPrice(b.price)}`).join('｜') || '—';
     return `<tr>
       <td><span class="spec-mono">${t.spec}</span></td>
       <td style="color:var(--text-secondary)">${t.brand}</td>
@@ -1722,7 +1700,7 @@ function openZoneDetail(zone) {
       <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${t.dot||'—'}</td>
       <td class="price-range">${priceStr}</td>
       <td><span class="pill ${pillClass(t.status)}">${t.status}</span></td>
-      <td style="color:var(--text-muted);font-size:11px;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.loc||'—'}</td>
+      <td style="color:var(--text-muted);font-size:11px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${batchSummary}</td>
     </tr>`;
   }).join('');
 
@@ -1751,31 +1729,37 @@ function filterAll() {
     return matchQ && matchZ && matchS;
   });
 
-  document.getElementById('all-count').textContent = `共 ${results.length} 筆 / 合計 ${results.reduce((s,t)=>s+t.qty,0)} 條`;
+  // 展開成「每個型號批次一列」（不合併同規格不同型號）
+  const rows = [];
+  results.forEach(t => {
+    const batches = (t.batches && t.batches.length) ? t.batches
+      : [{mfr:'', model:t.brand, dot:t.dot, qty:t.qty, price:t.priceMin, origin:t.origin}];
+    batches.forEach((b, idx) => rows.push({t, b, idx}));
+  });
+
+  document.getElementById('all-count').textContent = `${rows.length} 個型號 / ${results.length} 規格 / 合計 ${results.reduce((s,t)=>s+t.qty,0)} 條`;
 
   const tbody = document.getElementById('all-body');
-  if (!results.length) {
+  if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="icon">📋</div><div class="msg">沒有符合條件的品項</div></div></td></tr>';
     return;
   }
-  tbody.innerHTML = results.map(t => {
-    const priceStr = t.priceMin && t.priceMax && t.priceMin === t.priceMax
-      ? `$${t.priceMin.toLocaleString()}`
-      : (t.priceMin||t.priceMax ? `$${(t.priceMin||0).toLocaleString()}~${(t.priceMax||0).toLocaleString()}` : '—');
+  tbody.innerHTML = rows.map(({t, b, idx}) => {
     const specEsc = t.spec.replace(/'/g,"\\'");
+    const label = ((b.mfr||'') + ' ' + (b.model||'')).trim() || '—';
     return `<tr>
       <td><span class="spec-mono">${t.spec}</span></td>
       <td style="color:var(--text-muted)">${t.inch}</td>
       <td><span class="pill pill-zone">${t.zone}</span></td>
-      <td><span class="qty-num">${t.qty}</span></td>
-      <td style="color:var(--text-secondary)">${t.brand}</td>
-      <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${t.dot||'—'}</td>
-      <td class="price-range">${priceStr}</td>
-      <td style="color:var(--text-secondary)">${t.origin||'—'}</td>
+      <td><span class="qty-num">${b.qty}</span></td>
+      <td style="color:var(--text-secondary)">${label}</td>
+      <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:11px">${b.dot||'—'}</td>
+      <td class="price-range" style="color:var(--accent);font-weight:600">${b.price ? '$'+Number(b.price).toLocaleString() : '—'}</td>
+      <td style="color:var(--text-secondary)">${b.origin||t.origin||'—'}</td>
       <td><span class="pill ${pillClass(t.status)}">${t.status}</span></td>
       <td style="white-space:nowrap">
-        <button class="btn btn-ghost btn-sm" style="color:var(--accent);border-color:var(--accent-dim);margin-right:4px" onclick="openEdit('${specEsc}')">修改</button>
-        <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red);margin-right:4px" onclick="openQuickShipout('${specEsc}')">出貨</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--accent);border-color:var(--accent-dim);margin-right:4px" onclick="openEdit('${specEsc}', ${idx})">修改</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red);margin-right:4px" onclick="openQuickShipout('${specEsc}', ${idx})">出貨</button>
         <button class="btn btn-ghost btn-sm" onclick="openHistory('${specEsc}')">記錄</button>
       </td>
     </tr>`;
@@ -1797,7 +1781,7 @@ function renderAlerts() {
       <div class="alert-info">
         <div class="alert-spec">${t.spec}</div>
         <div class="alert-meta">${t.inch} · 倉位 ${t.zone} · 型號：${t.brand||'—'} · DOT: ${t.dot||'—'}</div>
-        <div class="alert-meta" style="margin-top:2px;font-size:11px">${t.loc||''}</div>
+        <div class="alert-meta" style="margin-top:2px;font-size:11px">${(t.batches||[]).map(b => `${((b.mfr||'')+' '+(b.model||'')).trim()} ${b.qty}條/${fmtPrice(b.price)}`).join('　')}</div>
       </div>
       <div style="text-align:right">
         <div class="alert-count">${t.qty}<span style="font-size:12px;color:var(--text-muted);font-weight:400"> 條</span></div>
@@ -1837,12 +1821,26 @@ function shipOut() {
   const normSpec = specRaw.toUpperCase().replace(/\s/g,'');
   const item = inventory.find(t => t.spec.toUpperCase() === normSpec);
   if (!item) { showToast('❌ 找不到此規格，請確認規格名稱'); return; }
-  if (item.qty < qty) { showToast(`❌ 庫存不足！目前僅剩 ${item.qty} 條`); return; }
+  if (!item.batches || !item.batches.length) {
+    item.batches = [{mfr:'', model:item.brand, dot:item.dot, qty:item.qty, price:item.priceMin, origin:item.origin}];
+  }
+  const total = item.batches.reduce((s,x)=>s+(parseInt(x.qty)||0),0);
+  if (total < qty) { showToast(`❌ 庫存不足！目前僅剩 ${total} 條`); return; }
   const note = document.getElementById('out-note').value.trim();
   const dateDisp = dateVal.replace(/-/g,'/');
 
-  item.qty -= qty;
-  item.status = statusFor(item);
+  // 扣庫存：優先扣指定型號批次，再依序扣其他
+  let remaining = qty;
+  const order = [];
+  if (shipoutPreferBatch != null && item.batches[shipoutPreferBatch]) order.push(shipoutPreferBatch);
+  item.batches.forEach((_, i) => { if (!order.includes(i)) order.push(i); });
+  for (const i of order) {
+    if (remaining <= 0) break;
+    const take = Math.min(parseInt(item.batches[i].qty)||0, remaining);
+    item.batches[i].qty -= take;
+    remaining -= take;
+  }
+  recomputeItem(item);
 
   txLog.unshift({
     id: Date.now(), type: '出貨', spec: item.spec, brand: item.brand, qty, price: item.priceMin,
@@ -1850,6 +1848,7 @@ function shipOut() {
   });
 
   shippedItems.unshift({spec: item.spec, qty, remaining: item.qty, date: dateDisp, note: note||'—'});
+  shipoutPreferBatch = null;
   saveInventory(); saveTxLog();
   renderShippedList();
   clearOutForm();
@@ -1857,23 +1856,31 @@ function shipOut() {
   showToast(`🚗 ${item.spec} 出貨 ${qty} 條，剩餘 ${item.qty} 條`);
 }
 
-function openQuickShipout(spec) {
+let shipoutPreferBatch = null;
+function openQuickShipout(spec, batchIdx) {
   goPage('shipout');
   document.getElementById('out-spec').value = spec;
   document.getElementById('out-date').value = new Date().toISOString().split('T')[0];
+  shipoutPreferBatch = (typeof batchIdx === 'number') ? batchIdx : null;
   outSpecHint();
 }
 
-// ── Edit (修改數量/金額) ──
+// ── Edit (逐型號修改數量/金額) ──
 let editingSpec = null;
-function openEdit(spec) {
+let editingBatchIdx = 0;
+function openEdit(spec, batchIdx) {
   const item = inventory.find(t => t.spec === spec);
   if (!item) { showToast('❌ 找不到此規格'); return; }
+  if (!item.batches || !item.batches.length) {
+    item.batches = [{mfr:'', model:item.brand, dot:item.dot, qty:item.qty, price:item.priceMin, origin:item.origin}];
+  }
+  editingBatchIdx = (typeof batchIdx === 'number' && item.batches[batchIdx]) ? batchIdx : 0;
+  const b = item.batches[editingBatchIdx];
   editingSpec = spec;
   document.getElementById('edit-spec').textContent = spec;
-  document.getElementById('edit-qty').value = item.qty;
-  document.getElementById('edit-price-min').value = item.priceMin || 0;
-  document.getElementById('edit-price-max').value = item.priceMax || 0;
+  document.getElementById('edit-model').textContent = ((b.mfr||'') + ' ' + (b.model||'')).trim() || '—';
+  document.getElementById('edit-qty').value = b.qty;
+  document.getElementById('edit-price').value = b.price || 0;
   document.getElementById('edit-modal').classList.add('show');
 }
 function closeEditModal() {
@@ -1883,20 +1890,19 @@ function closeEditModal() {
 function saveEdit() {
   const item = inventory.find(t => t.spec === editingSpec);
   if (!item) { closeEditModal(); return; }
+  const b = item.batches[editingBatchIdx];
+  if (!b) { closeEditModal(); return; }
   const newQty = parseInt(document.getElementById('edit-qty').value);
-  let pMin = parseInt(document.getElementById('edit-price-min').value) || 0;
-  let pMax = parseInt(document.getElementById('edit-price-max').value) || 0;
+  const newPrice = parseInt(document.getElementById('edit-price').value) || 0;
   if (isNaN(newQty) || newQty < 0) { showToast('⚠️ 請輸入有效的庫存數量'); return; }
-  if (pMax < pMin) { const t = pMin; pMin = pMax; pMax = t; }  // 自動修正上下限顛倒
-  item.qty = newQty;
-  item.priceMin = pMin;
-  item.priceMax = pMax;
-  item.status = statusFor(item);
+  b.qty = newQty;
+  b.price = newPrice;
+  recomputeItem(item);   // 重算合計數量、報價範圍、狀態
   saveInventory();
   closeEditModal();
   filterAll();
   renderOverview();
-  showToast(`✏️ 已更新 ${item.spec}：庫存 ${newQty}，報價 ${pMin === pMax ? 'NT$'+pMin.toLocaleString() : 'NT$'+pMin.toLocaleString()+'~'+pMax.toLocaleString()}`);
+  showToast(`✏️ 已更新 ${item.spec}（${(b.mfr||'')+' '+(b.model||'')}）：庫存 ${newQty}，報價 ${fmtPrice(newPrice)}`);
 }
 
 function clearOutForm() {
