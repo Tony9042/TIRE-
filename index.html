@@ -1035,6 +1035,7 @@
             <option value="">全部類型</option>
             <option value="進貨">進貨</option>
             <option value="出貨">出貨</option>
+            <option value="調整">調整</option>
           </select>
           <input type="date" id="log-date-from" onchange="renderLog()" title="起始日期">
           <span style="color:var(--text-muted);font-size:13px">–</span>
@@ -4545,15 +4546,26 @@ function saveEdit() {
   const newQty = parseInt(document.getElementById('edit-qty').value);
   const newPrice = parseInt(document.getElementById('edit-price').value) || 0;
   if (isNaN(newQty) || newQty < 0) { showToast('⚠️ 請輸入有效的庫存數量'); return; }
+  const oldQty = parseInt(b.qty) || 0;
+  const modelLabel = ((b.mfr||'')+' '+(b.model||'')).trim() || '(未命名型號)';
   b.qty = newQty;
   b.price = newPrice;
   recomputeItem(item);   // 重算合計數量、報價範圍、狀態
+  // 數量有變動 → 留一筆「調整」記錄，確保庫存變動都查得到
+  if (newQty !== oldQty) {
+    txLog.unshift({
+      id: Date.now(), type: '調整', spec: item.spec, brand: modelLabel,
+      qty: newQty - oldQty, price: newPrice,
+      date: todayStr(), datetime: nowStr(), note: `手動修改庫存 ${oldQty} → ${newQty}`
+    });
+    saveTxLog();
+  }
   saveInventory();
   closeEditModal();
   filterAll();
   renderOverview();
   scheduleAutoSync();
-  showToast(`✏️ 已更新 ${item.spec}（${(b.mfr||'')+' '+(b.model||'')}）：庫存 ${newQty}，報價 ${fmtPrice(newPrice)}`);
+  showToast(`✏️ 已更新 ${item.spec}（${modelLabel}）：庫存 ${newQty}，報價 ${fmtPrice(newPrice)}`);
 }
 
 function clearOutForm() {
@@ -4617,16 +4629,24 @@ function renderLog() {
     tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="icon">📜</div><div class="msg">目前沒有進出貨記錄</div></div></td></tr>';
     return;
   }
-  tbody.innerHTML = logs.map(l => `
-    <tr>
+  tbody.innerHTML = logs.map(l => {
+    const isAdj = l.type === '調整';
+    const pill = l.type==='進貨' ? 'pill-ok' : (isAdj ? 'pill-zone' : 'pill-warn');
+    // 調整：依正負決定顏色與符號；進貨/出貨維持原樣
+    const n = Number(l.qty);
+    const up = isAdj ? n >= 0 : (l.type==='進貨');
+    const sign = up ? '+' : '−';
+    const mag = isAdj ? Math.abs(n) : l.qty;
+    return `<tr>
       <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">${l.datetime||l.date}</td>
-      <td><span class="pill ${l.type==='進貨'?'pill-ok':'pill-warn'}">${l.type}</span></td>
+      <td><span class="pill ${pill}">${l.type}</span></td>
       <td><span class="spec-mono">${l.spec}</span></td>
       <td style="color:var(--text-secondary)">${l.brand||'—'}</td>
-      <td><span class="qty-num" style="color:${l.type==='進貨'?'var(--green)':'var(--red)'}">${l.type==='進貨'?'+':'−'}${l.qty}</span></td>
+      <td><span class="qty-num" style="color:${up?'var(--green)':'var(--red)'}">${sign}${mag}</span></td>
       <td class="price-range">${l.price ? 'NT$'+l.price.toLocaleString() : '—'}</td>
       <td style="color:var(--text-muted);font-size:12px">${l.note||'—'}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 function clearLogFilter() {
@@ -4664,15 +4684,20 @@ function openHistory(spec) {
         </div>
       </div>
       <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
-        ${logs.map(l => `
+        ${logs.map(l => {
+          const isAdj = l.type==='調整';
+          const n = Number(l.qty);
+          const up = isAdj ? n >= 0 : (l.type==='進貨');
+          const mag = isAdj ? Math.abs(n) : l.qty;
+          return `
           <div class="log-item">
-            <span class="log-type ${l.type==='進貨'?'log-in':'log-out'}">${l.type}</span>
+            <span class="log-type ${up?'log-in':'log-out'}">${l.type}</span>
             <div class="log-body">
               <div class="log-spec">${l.spec}</div>
               <div class="log-meta">${l.datetime||l.date}　型號：${l.brand||'—'}　${l.note ? '備註：'+l.note : ''}</div>
             </div>
-            <div class="log-qty ${l.type==='進貨'?'in':'out'}">${l.type==='進貨'?'+':'−'}${l.qty}</div>
-          </div>`).join('')}
+            <div class="log-qty ${up?'in':'out'}">${up?'+':'−'}${mag}</div>
+          </div>`;}).join('')}
       </div>`;
   }
   document.getElementById('history-modal').classList.add('show');
