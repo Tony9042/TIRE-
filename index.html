@@ -846,6 +846,19 @@
               <div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 既有規格請從下拉選單點選，避免格式不同變成重複品項</div>
             </div>
             <div class="form-group">
+              <label>品牌</label>
+              <select id="add-mfr" class="input-wide">
+                <option value="">未指定</option>
+                <option>米其林</option>
+                <option>南港</option>
+                <option>普利司通</option>
+                <option>韓泰</option>
+                <option>馬牌</option>
+                <option>瑪吉斯</option>
+                <option>固特異</option>
+              </select>
+            </div>
+            <div class="form-group">
               <label>型號（必填）</label>
               <input type="text" id="add-brand" placeholder="例：PS5、SA4、AG3" class="input-wide">
             </div>
@@ -4417,6 +4430,7 @@ function addInventory() {
     showToast('⚠️ 請填寫進貨日期！');
     return;
   }
+  const mfr = document.getElementById('add-mfr').value;
   const price = parseInt(document.getElementById('add-price').value)||0;
   const dot = document.getElementById('add-dot').value.trim();
   const origin = document.getElementById('add-origin').value;
@@ -4430,14 +4444,14 @@ function addInventory() {
   const normSpec = normalizeSpec(spec);
   const inch = guessInch(normSpec);
 
-  // 此次進貨建立一個批次（型號/DOT/數量/價格各自獨立）
-  const newBatch = {mfr:'', model:brand, dot, qty, price, origin};
+  // 此次進貨建立一個批次（品牌/型號/DOT/數量/價格各自獨立）
+  const newBatch = {mfr, model:brand, dot, qty, price, origin};
 
   const existing = inventory.find(t => t.spec.toUpperCase() === normSpec);
   if (existing) {
     if (!existing.batches) existing.batches = [];
-    // 同型號同DOT同價格 → 累加數量；否則新增一筆批次
-    const same = existing.batches.find(b => (b.model||'')===brand && (b.dot||'')===dot && (parseInt(b.price)||0)===price);
+    // 同品牌同型號同DOT同價格 → 累加數量；否則新增一筆批次
+    const same = existing.batches.find(b => (b.mfr||'')===mfr && (b.model||'')===brand && (b.dot||'')===dot && (parseInt(b.price)||0)===price);
     if (same) same.qty = (parseInt(same.qty)||0) + qty;
     else existing.batches.push(newBatch);
     recomputeItem(existing);
@@ -4490,6 +4504,7 @@ function clearAddForm() {
     document.getElementById(id).value = '';
   });
   document.getElementById('add-origin').value = '';
+  document.getElementById('add-mfr').value = '';
   document.getElementById('add-truck').value = '否';
   // Set today's date as default
   document.getElementById('add-date').value = new Date().toISOString().split('T')[0];
