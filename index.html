@@ -702,7 +702,7 @@
           <div class="stat-card red">
             <div class="label">低庫存警示</div>
             <div class="value" id="ov-alert-count">—</div>
-            <div class="note">庫存 ≤ 4 條</div>
+            <div class="note">庫存低於 4 條</div>
           </div>
           <div class="stat-card blue">
             <div class="label">需補貨規格</div>
@@ -841,7 +841,9 @@
           <div class="form-grid">
             <div class="form-group">
               <label>規格（必填）</label>
-              <input type="text" id="add-spec" placeholder="例：225/55R18" class="input-wide">
+              <input type="text" id="add-spec" placeholder="輸入可搜尋既有規格，或打新規格" class="input-wide" list="spec-datalist" autocomplete="off">
+              <datalist id="spec-datalist"></datalist>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">💡 既有規格請從下拉選單點選，避免格式不同變成重複品項</div>
             </div>
             <div class="form-group">
               <label>型號（必填）</label>
@@ -1124,12 +1126,12 @@
             <div class="value" id="al-critical">—</div>
           </div>
           <div class="stat-card">
-            <div class="label">需補貨（≤4條）</div>
+            <div class="label">需補貨（3條）</div>
             <div class="value" id="al-warn">—</div>
           </div>
           <div class="stat-card blue">
-            <div class="label">低庫存警示門檻</div>
-            <div class="value">4<span class="unit">條</span></div>
+            <div class="label">需補貨門檻</div>
+            <div class="value" style="font-size:20px">低於 4 條</div>
           </div>
         </div>
         <div id="alert-list"></div>
@@ -4197,6 +4199,7 @@ function goPage(id) {
   if (id === 'all') renderAll();
   if (id === 'alerts') renderAlerts();
   if (id === 'log') renderLog();
+  if (id === 'add') populateSpecDatalist();
 }
 
 function pillClass(status) {
@@ -4228,10 +4231,11 @@ function recomputeItem(t) {
   return t;
 }
 
-// 配件類不適用輪胎的低庫存門檻（≤2/≤4），只在歸零時提示補貨
+// 配件類不適用輪胎的低庫存門檻，只在歸零時提示補貨
+// 輪胎：低於 4 條（≤3）才需補貨，4 條（含）以上算正常
 function statusFor(item) {
   if (item.zone === '配件') return item.qty <= 0 ? '需補貨' : '正常';
-  return item.qty <= 2 ? '低庫存' : item.qty <= 4 ? '需補貨' : '正常';
+  return item.qty <= 2 ? '低庫存' : item.qty <= 3 ? '需補貨' : '正常';
 }
 
 // ── Overview ──
@@ -4423,7 +4427,7 @@ function addInventory() {
   const note = document.getElementById('add-note').value.trim();
   const dateDisp = dateVal.replace(/-/g,'/');
 
-  const normSpec = spec.toUpperCase().replace(/\s/g,'');
+  const normSpec = normalizeSpec(spec);
   const inch = guessInch(normSpec);
 
   // 此次進貨建立一個批次（型號/DOT/數量/價格各自獨立）
@@ -4464,13 +4468,21 @@ function addInventory() {
 }
 
 function guessInch(spec) {
-  const m = spec.match(/R(\d+)/i);
-  if (m) {
-    const n = parseInt(m[1]);
-    if (n <= 15) return n+'吋';
-    return n+'吋';
-  }
+  const m = spec.match(/R(\d+(?:\.\d+)?)/i);
+  if (m) return parseFloat(m[1]) + '吋';
   return '?吋';
+}
+
+// 統一規格格式：大寫、去空白、「/」轉「R」，例 195/85/16 → 195/85R16、700/15C → 700R15C
+function normalizeSpec(raw) {
+  let s = (raw||'').toUpperCase().replace(/\s/g,'').replace(/-/g,'/');
+  if (/R/.test(s)) return s;                    // 已是 R 格式（如 225/55R18）直接用
+  const cSuffix = /C$/.test(s) ? 'C' : '';
+  let core = cSuffix ? s.slice(0,-1) : s;
+  const parts = core.split('/');
+  if (parts.length === 3) core = parts[0]+'/'+parts[1]+'R'+parts[2];
+  else if (parts.length === 2) core = parts[0]+'R'+parts[1];
+  return core + cSuffix;
 }
 
 function clearAddForm() {
@@ -4611,7 +4623,8 @@ function filterAll() {
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" style="color:var(--accent);border-color:var(--accent-dim);margin-right:4px" onclick="openEdit('${specEsc}', ${idx})">修改</button>
         <button class="btn btn-ghost btn-sm" style="color:var(--red);border-color:var(--red);margin-right:4px" onclick="openQuickShipout('${specEsc}', ${idx})">出貨</button>
-        <button class="btn btn-ghost btn-sm" onclick="openHistory('${specEsc}')">記錄</button>
+        <button class="btn btn-ghost btn-sm" style="margin-right:4px" onclick="openHistory('${specEsc}')">記錄</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--text-muted)" onclick="deleteBatch('${specEsc}', ${idx})">🗑 刪除</button>
       </td>
     </tr>`;
   }).join('');
@@ -4620,7 +4633,7 @@ function filterAll() {
 // ── Alerts ──
 function renderAlerts() {
   const critical = inventory.filter(t => t.zone !== '配件' && t.qty <= 2);
-  const warn = inventory.filter(t => t.zone !== '配件' && t.qty > 2 && t.qty <= 4);
+  const warn = inventory.filter(t => t.zone !== '配件' && t.qty === 3);
   document.getElementById('al-critical').innerHTML = critical.length + '<span class="unit">種</span>';
   document.getElementById('al-warn').innerHTML = warn.length + '<span class="unit">種</span>';
 
@@ -4640,6 +4653,46 @@ function renderAlerts() {
       </div>
     </div>`;
   }).join('') : '<div class="empty-state"><div class="icon">✅</div><div class="msg">目前無低庫存警示</div></div>';
+}
+
+// ── 刪除型號批次（修正誤建/重複） ──
+function deleteBatch(spec, batchIdx) {
+  const item = inventory.find(t => t.spec === spec);
+  if (!item || !item.batches || !item.batches[batchIdx]) { showToast('❌ 找不到此型號'); return; }
+  const b = item.batches[batchIdx];
+  const label = ((b.mfr||'')+' '+(b.model||'')).trim() || '(未命名型號)';
+  const q = parseInt(b.qty)||0;
+  if (!confirm(`確定要刪除這筆嗎？\n\n規格：${spec}\n型號：${label}\n庫存：${q} 條　報價：${fmtPrice(b.price)}\n\n刪除後此型號會從庫存移除${q>0?'，並扣掉這 '+q+' 條庫存':''}。`)) return;
+  // 若庫存>0，留一筆調整記錄（可追溯）
+  if (q > 0) {
+    txLog.unshift({
+      id: Date.now(), type: '調整', spec: item.spec, brand: label,
+      qty: -q, price: b.price, date: todayStr(), datetime: nowStr(), note: `刪除型號（誤建/重複）`
+    });
+    saveTxLog();
+  }
+  item.batches.splice(batchIdx, 1);
+  if (!item.batches.length) {
+    // 整個規格沒批次了 → 移除品項
+    const i = inventory.indexOf(item);
+    if (i >= 0) inventory.splice(i, 1);
+  } else {
+    recomputeItem(item);
+  }
+  saveInventory();
+  filterAll();
+  renderOverview();
+  populateSpecDatalist();
+  scheduleAutoSync();
+  showToast(`🗑 已刪除 ${spec}（${label}）`);
+}
+
+// ── 新增庫存：規格下拉選單（既有規格） ──
+function populateSpecDatalist() {
+  const dl = document.getElementById('spec-datalist');
+  if (!dl) return;
+  const specs = [...new Set(inventory.map(t => t.spec))].sort();
+  dl.innerHTML = specs.map(s => `<option value="${s}">`).join('');
 }
 
 // ── Shipout ──
@@ -5098,8 +5151,12 @@ function closeSidebar() {
 }
 
 // ── Init ──
+// 套用最新門檻：重算所有品項狀態（例如原本 4 條標需補貨的改為正常）
+inventory.forEach(t => { if (t.batches && t.batches.length) recomputeItem(t); else t.status = statusFor(t); });
+saveInventory();
 renderOverview();
 loadSavedToken();
+populateSpecDatalist();
 setSyncBadge(localStorage.getItem(TOKEN_KEY) ? 'ready' : 'notoken');
 // Set today as default date for forms
 const todayISO = new Date().toISOString().split('T')[0];
