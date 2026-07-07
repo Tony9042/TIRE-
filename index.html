@@ -1161,15 +1161,37 @@
       <h2 style="margin:0">修改庫存</h2>
       <button class="btn btn-ghost btn-sm" onclick="closeEditModal()">✕ 關閉</button>
     </div>
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">規格：<span id="edit-spec" style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:600"></span></div>
-    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">型號：<span id="edit-model" style="color:var(--text-primary);font-weight:600"></span></div>
-    <div class="form-group">
-      <label>此型號庫存數量（條/件）</label>
-      <input type="number" id="edit-qty" min="0">
-    </div>
-    <div class="form-group">
-      <label>此型號報價（NT$）</label>
-      <input type="number" id="edit-price" min="0">
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">規格：<span id="edit-spec" style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:600"></span></div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>品牌</label>
+        <select id="edit-mfr" class="input-wide">
+          <option value="">未指定</option>
+          <option>米其林</option>
+          <option>南港</option>
+          <option>普利司通</option>
+          <option>韓泰</option>
+          <option>馬牌</option>
+          <option>瑪吉斯</option>
+          <option>固特異</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>型號</label>
+        <input type="text" id="edit-model" class="input-wide" placeholder="例：PS5、SA4">
+      </div>
+      <div class="form-group">
+        <label>年份 / DOT</label>
+        <input type="text" id="edit-dot" class="input-wide" placeholder="例：3724">
+      </div>
+      <div class="form-group">
+        <label>庫存數量（條/件）</label>
+        <input type="number" id="edit-qty" min="0" class="input-wide">
+      </div>
+      <div class="form-group form-full">
+        <label>報價（NT$）</label>
+        <input type="number" id="edit-price" min="0" class="input-wide">
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeEditModal()">取消</button>
@@ -4988,7 +5010,9 @@ function openEdit(spec, batchIdx) {
   const b = item.batches[editingBatchIdx];
   editingSpec = spec;
   document.getElementById('edit-spec').textContent = spec;
-  document.getElementById('edit-model').textContent = ((b.mfr||'') + ' ' + (b.model||'')).trim() || '—';
+  document.getElementById('edit-mfr').value = b.mfr || '';
+  document.getElementById('edit-model').value = b.model || '';
+  document.getElementById('edit-dot').value = b.dot || '';
   document.getElementById('edit-qty').value = b.qty;
   document.getElementById('edit-price').value = b.price || 0;
   document.getElementById('edit-modal').classList.add('show');
@@ -5006,6 +5030,10 @@ function saveEdit() {
   const newPrice = parseInt(document.getElementById('edit-price').value) || 0;
   if (isNaN(newQty) || newQty < 0) { showToast('⚠️ 請輸入有效的庫存數量'); return; }
   const oldQty = parseInt(b.qty) || 0;
+  // 更新品牌 / 型號 / 年份
+  b.mfr = document.getElementById('edit-mfr').value;
+  b.model = document.getElementById('edit-model').value.trim();
+  b.dot = document.getElementById('edit-dot').value.trim();
   const modelLabel = ((b.mfr||'')+' '+(b.model||'')).trim() || '(未命名型號)';
   b.qty = newQty;
   b.price = newPrice;
