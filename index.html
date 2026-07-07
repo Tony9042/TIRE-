@@ -871,6 +871,10 @@
               <input type="number" id="add-price" placeholder="每條報價">
             </div>
             <div class="form-group">
+              <label>成本（NT$，每條）</label>
+              <input type="number" id="add-cost" placeholder="進貨成本（可空白）">
+            </div>
+            <div class="form-group">
               <label>進貨日期（必填）</label>
               <input type="date" id="add-date" class="input-wide">
             </div>
@@ -1185,12 +1189,24 @@
         <input type="text" id="edit-dot" class="input-wide" placeholder="例：3724">
       </div>
       <div class="form-group">
+        <label>產地</label>
+        <select id="edit-origin" class="input-wide">
+          <option value="">未指定</option>
+          <option>大</option><option>泰</option><option>台</option><option>歐</option>
+          <option>義</option><option>法</option><option>日</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>庫存數量（條/件）</label>
         <input type="number" id="edit-qty" min="0" class="input-wide">
       </div>
-      <div class="form-group form-full">
+      <div class="form-group">
         <label>報價（NT$）</label>
         <input type="number" id="edit-price" min="0" class="input-wide">
+      </div>
+      <div class="form-group form-full">
+        <label>成本（NT$，每條）</label>
+        <input type="number" id="edit-cost" min="0" class="input-wide" placeholder="進貨成本">
       </div>
     </div>
     <div class="modal-actions">
@@ -4655,6 +4671,7 @@ function addInventory() {
   }
   const mfr = document.getElementById('add-mfr').value;
   const price = parseInt(document.getElementById('add-price').value)||0;
+  const cost = parseInt(document.getElementById('add-cost').value)||0;
   const dot = document.getElementById('add-dot').value.trim();
   const origin = document.getElementById('add-origin').value;
   const floor = document.getElementById('add-floor').value;
@@ -4667,8 +4684,8 @@ function addInventory() {
   const normSpec = normalizeSpec(spec);
   const inch = guessInch(normSpec);
 
-  // 此次進貨建立一個批次（品牌/型號/DOT/數量/價格各自獨立）
-  const newBatch = {mfr, model:brand, dot, qty, price, origin};
+  // 此次進貨建立一個批次（品牌/型號/DOT/數量/價格/成本各自獨立）
+  const newBatch = {mfr, model:brand, dot, qty, price, cost, origin};
 
   const existing = inventory.find(t => t.spec.toUpperCase() === normSpec);
   if (existing) {
@@ -4723,7 +4740,7 @@ function normalizeSpec(raw) {
 }
 
 function clearAddForm() {
-  ['add-spec','add-brand','add-qty','add-price','add-dot','add-location','add-note','add-date'].forEach(id => {
+  ['add-spec','add-brand','add-qty','add-price','add-cost','add-dot','add-location','add-note','add-date'].forEach(id => {
     document.getElementById(id).value = '';
   });
   document.getElementById('add-origin').value = '';
@@ -5046,8 +5063,10 @@ function openEdit(spec, batchIdx) {
   document.getElementById('edit-mfr').value = b.mfr || '';
   document.getElementById('edit-model').value = b.model || '';
   document.getElementById('edit-dot').value = b.dot || '';
+  document.getElementById('edit-origin').value = b.origin || '';
   document.getElementById('edit-qty').value = b.qty;
   document.getElementById('edit-price').value = b.price || 0;
+  document.getElementById('edit-cost').value = b.cost || '';
   document.getElementById('edit-modal').classList.add('show');
 }
 function closeEditModal() {
@@ -5063,10 +5082,12 @@ function saveEdit() {
   const newPrice = parseInt(document.getElementById('edit-price').value) || 0;
   if (isNaN(newQty) || newQty < 0) { showToast('⚠️ 請輸入有效的庫存數量'); return; }
   const oldQty = parseInt(b.qty) || 0;
-  // 更新品牌 / 型號 / 年份
+  // 更新品牌 / 型號 / 年份 / 產地 / 成本
   b.mfr = document.getElementById('edit-mfr').value;
   b.model = document.getElementById('edit-model').value.trim();
   b.dot = document.getElementById('edit-dot').value.trim();
+  b.origin = document.getElementById('edit-origin').value;
+  b.cost = parseInt(document.getElementById('edit-cost').value) || 0;
   const modelLabel = ((b.mfr||'')+' '+(b.model||'')).trim() || '(未命名型號)';
   b.qty = newQty;
   b.price = newPrice;
